@@ -13,7 +13,8 @@ def multidetect(addr,cctv_name,homoMat,return_dict,num):
     f = open('result{}.txt'.format(cctv_name), 'a')
     font = cv2.FONT_HERSHEY_SIMPLEX
     #yolov5
-    model = torch.hub.load('ultralytics/yolov5', 'custom', path='yolov5s.pt',device=num%3)
+    model = torch.hub.load('/home/ves/yolov5', 'custom', path='yolov5s.pt',source='local',device=num%3)
+    #model = torch.hub.load('ultralytics/yolov5', 'custom', path='yolov5s.pt',device=num%3)
     model.classes=[0]
 
 
