@@ -5,12 +5,12 @@ import multiprocessing
 import numpy as np
 import torch
 import datetime
-from transmit_server import put
-import requests
 import json
+import pandas as pd
 
 def multidetect(addr,cctv_name,homoMat,return_dict,num):
-    f = open('result{}.txt'.format(cctv_name), 'a')
+
+    # f = open('result{}.txt'.format(cctv_name), 'a')
     font = cv2.FONT_HERSHEY_SIMPLEX
     #yolov5
     model = torch.hub.load('/home/ves/yolov5', 'custom', path='yolov5s.pt',source='local',device=num%3)
@@ -35,9 +35,10 @@ def multidetect(addr,cctv_name,homoMat,return_dict,num):
             points=[]
 
             #yolo5
+            csv=[]
             for i in bodys.pandas().xyxy[0].values.tolist():
-                f.write("Video({}) found\n".format(cctv_name))
-                f.write("{}\n".format(i))
+                # f.write("Video({}) found\n".format(cctv_name))
+                # f.write("{}\n".format(i))
                 x1,y1,x2,y2,conf,cls,name=int(i[0]),int(i[1]),int(i[2]),int(i[3]),i[4],i[5],i[6]
 
                 cv2.rectangle(img,(x1,y1),(x2,y2),(0,255,0),2)
@@ -71,10 +72,13 @@ def multidetect(addr,cctv_name,homoMat,return_dict,num):
             out.write(img)
             endTime=time.time()
             print("MultiProcess({}):{:.3f}s\n".format(cctv_name,endTime-startTime))
-            f.write("{} MultiProcess({}):{:.3f}s\n".format(datetime.datetime.now(),cctv_name,endTime-startTime))
+            # f.write("{} MultiProcess({}):{:.3f}s\n".format(datetime.datetime.now(),cctv_name,endTime-startTime))
+            df=pd.DataFrame([datetime,cctv_name,endTime-startTime,len(bodys.pandas().xyxy[0].values.tolist())])
+            df.to_csv("./result.csv",header=False,index=False)
+
         else:
             print("Video({}) Not found".format(cctv_name))
-            f.write("{} Video({}) Not found\n".format(datetime.datetime.now(),cctv_name))
+            # f.write("{} Video({}) Not found\n".format(datetime.datetime.now(),cctv_name))
             cap.release()
             out.release()
             break
