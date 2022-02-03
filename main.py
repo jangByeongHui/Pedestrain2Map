@@ -129,9 +129,9 @@ def send2server(data):
                 for num,(x,y) in enumerate(points):
                     temp_list.append({'id':f'{cctv_name}_{num+1}','top':y,'left':y})
 
-            if state:
-                print(json.dumps({'lists':temp_list}))
-                # put(url , {'lists':temp_list}, headers)
+        if state:
+            print(json.dumps({'lists':temp_list}))
+            # put(url , {'lists':temp_list}, headers)
     except Exception as e:
         print("Send2Server Error : {}".format(e))
         pass
