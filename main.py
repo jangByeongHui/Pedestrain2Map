@@ -5,6 +5,9 @@ import multiprocessing
 import numpy as np
 import torch
 import datetime
+from transmit_server import put
+import requests
+import json
 
 def multidetect(addr,cctv_name,homoMat,return_dict):
     f = open('result{}.txt'.format(cctv_name), 'a')
@@ -39,6 +42,7 @@ def multidetect(addr,cctv_name,homoMat,return_dict):
                 cv2.rectangle(img,(x1,y1),(x2,y2),(0,255,0),2)
                 cv2.putText(img,i[6],(x1-5,y1-5),font,0.5,(255,0,0),1)
                 cv2.putText(img,"{:.2f}".format(conf), (x1+5, y1 - 5), font, 0.5, (255, 0, 0), 1)
+
                 # 보행자 좌표 표시
                 target_x=int((x1+x2)/2)
                 target_y=int(y2)
@@ -92,6 +96,7 @@ def show_image(return_dict):
         startTime = time.time()
         Map = cv2.imread(Map_path)
         try:
+            send2server(return_dict) #지도 표시전 서버에 보행자 위치 전송
             for i in return_dict.keys():
                 flag, points= return_dict[i]
                 if flag:
@@ -109,6 +114,28 @@ def show_image(return_dict):
         if k == 27:
             out.release()
             break
+
+#추후 서버 전송
+def send2server(data):
+    headers = {'Content-Type': 'application/json'}
+    url = 'http://cheonho-api.watchmile.com/api/v1/parking/slot/'
+    try:
+        temp_list=[]
+        state=None
+        for cctv_name in data.keys():
+            flag,points=data[cctv_name]
+            if flag:
+                state=True
+                for num,(x,y) in enumerate(points):
+                    temp_list.append({'id':f'{cctv_name}_{num+1}','top':y,'left':y})
+
+            if state:
+                print(json.dumps({'lists':temp_list}))
+                # put(url , {'lists':temp_list}, headers)
+    except Exception as e:
+        print("Send2Server Error : {}".format(e))
+        pass
+
 
 def main():
     # RTSP 주소 모음
