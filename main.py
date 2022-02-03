@@ -6,11 +6,11 @@ import numpy as np
 import torch
 import datetime
 import json
-import pandas as pd
+import csv
 
 def multidetect(addr,cctv_name,homoMat,return_dict,num):
 
-    # f = open('result{}.txt'.format(cctv_name), 'a')
+
     font = cv2.FONT_HERSHEY_SIMPLEX
     #yolov5
     model = torch.hub.load('/home/ves/yolov5', 'custom', path='yolov5s.pt',source='local',device=num%3)
@@ -35,7 +35,6 @@ def multidetect(addr,cctv_name,homoMat,return_dict,num):
             points=[]
 
             #yolo5
-            csv=[]
             for i in bodys.pandas().xyxy[0].values.tolist():
                 # f.write("Video({}) found\n".format(cctv_name))
                 # f.write("{}\n".format(i))
@@ -73,8 +72,9 @@ def multidetect(addr,cctv_name,homoMat,return_dict,num):
             endTime=time.time()
             print("MultiProcess({}):{:.3f}s\n".format(cctv_name,endTime-startTime))
             # f.write("{} MultiProcess({}):{:.3f}s\n".format(datetime.datetime.now(),cctv_name,endTime-startTime))
-            df=pd.DataFrame([datetime,cctv_name,endTime-startTime,len(bodys.pandas().xyxy[0].values.tolist())])
-            df.to_csv("./result.csv",header=False,index=False)
+            with open('result.csv', 'a', encoding='utf-8', newline='') as f:
+                wr =csv.writer(f)
+                wr.writerow([datetime,cctv_name,endTime-startTime,len(bodys.pandas().xyxy[0].values.tolist())])
 
         else:
             print("Video({}) Not found".format(cctv_name))
