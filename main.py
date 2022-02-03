@@ -9,11 +9,11 @@ from transmit_server import put
 import requests
 import json
 
-def multidetect(addr,cctv_name,homoMat,return_dict):
+def multidetect(addr,cctv_name,homoMat,return_dict,num):
     f = open('result{}.txt'.format(cctv_name), 'a')
     font = cv2.FONT_HERSHEY_SIMPLEX
     #yolov5
-    model = torch.hub.load('ultralytics/yolov5', 'custom', path='yolov5s.pt')
+    model = torch.hub.load('ultralytics/yolov5', 'custom', path='yolov5s.pt',device=num%3)
     model.classes=[0]
 
 
@@ -96,7 +96,7 @@ def show_image(return_dict):
         startTime = time.time()
         Map = cv2.imread(Map_path)
         try:
-            send2server(return_dict) #지도 표시전 서버에 보행자 위치 전송
+            # send2server(return_dict) #지도 표시전 서버에 보행자 위치 전송
             for i in return_dict.keys():
                 flag, points= return_dict[i]
                 if flag:
@@ -150,7 +150,7 @@ def main():
     work_list=[]
     # 멀티 프로세싱을 위한 작업 아규먼트 값
     for num,cctv_name in enumerate(cams.keys()):
-        work_list.append((Rtsp[num],cctv_name,cams[cctv_name]['homoMat'],return_dict))
+        work_list.append((Rtsp[num],cctv_name,cams[cctv_name]['homoMat'],return_dict,num))
 
     # 병렬 프로세스 실행
     jobs=[]
