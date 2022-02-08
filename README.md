@@ -24,3 +24,35 @@ cd pedestrain2map
 //검출할 이미지나 영상 정보 입력후
 python main.py //실행
 ```
+
+2.pixelpicker
+
+```
+cd pedestrain2map
+
+//소스코드내에서 구하고자 하는 CCTV, MAP 이미지 경로를 CCTV_PATH, MAP_PATH의 입력
+
+python pixelpicker.py
+```
+마우스 왼쪽 클릭 -> 좌표 확인
+
+마우스 오른쪽 클릭 -> 좌표 삭제
+
+ESC -> 종료 
+
+### 예시
+<img src ="data/pixelpicker.png">
+
+3. computeMat.py
+
+```
+# pixelpicker로 얻은 매칭되는 픽셀 좌표 값을 소스 안에 입력
+
+# pts_src=np.float32([[1269,605],[42,442],[17,712],[1261,709]]) #cctv
+# pts_dst=np.float32([[1100,1946],[615,1954],[945,2147],[1078,2079]]) #map
+
+#실행
+python computeMat.py
+
+#결과 값으로 나온 Homography 행렬 값을 config_hd_2.py안에 각각의 CCTV별로 'homoMat'에 입력
+```
