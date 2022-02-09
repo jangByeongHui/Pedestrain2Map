@@ -66,15 +66,8 @@ def writeVideo(Rtsp_addr,cctv_name,num):
                 cv2.putText(temp_frame, "PersonDetect!", (150, 70), font, 1, (0, 0, 255), 1)  # 감지 표시
             cv2.imshow(cctv_name, temp_frame)
         else:
-            #비디오 못찾으면 재연결 시도
+            #비디오 못찾으면 에러 표시
             print(f'{cctv_name}:{Rtsp_addr} Not Found retry Reload')
-            video_capture = cv2.VideoCapture(Rtsp_addr)
-            video_capture.set(3, 1280)
-            video_capture.set(4, 720)
-            streaming_window_width = int(video_capture.get(3))
-            streaming_window_height = int(video_capture.get(4))
-            fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-            out = cv2.VideoWriter(path, fourcc, fps, (streaming_window_width, streaming_window_height))
 
 
         
