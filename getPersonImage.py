@@ -4,23 +4,19 @@ import multiprocessing
 from config_hd_2 import cams
 import torch
 
-def writeVideo(work):
-    Rtsp_addr,cctv_name,num = work
+def writeVideo(Rtsp_addr,cctv_name,num):
     currentTime = datetime.datetime.now()
     video_capture = cv2.VideoCapture(Rtsp_addr)
 
     font = cv2.FONT_HERSHEY_SIMPLEX  # 글씨 폰트
 
-    video_capture.set(3, 1280)
-    video_capture.set(4, 720)
-    
     fps = 20
-    
+
     streaming_window_width = int(video_capture.get(3))
     streaming_window_height = int(video_capture.get(4))  
     
    
-    fileName = cctv_name+str(currentTime.strftime('%Y %m %d %H %M %S'))
+    fileName = "{}_{}".format(cctv_name,str(currentTime.strftime('%Y %m %d %H %M %S')))
 
   
     path = './CCTV_Person/{}.mp4'.format(fileName)
@@ -38,29 +34,29 @@ def writeVideo(work):
     while True:
         ret, frame = video_capture.read()
         bodys = model(frame, size=640)
+        if ret:
+            # yolo5
+            for i in bodys.pandas().xyxy[0].values.tolist():
 
-        # yolo5
-        for i in bodys.pandas().xyxy[0].values.tolist():
+                # 결과
+                x1, y1, x2, y2, conf, cls, name = int(i[0]), int(i[1]), int(i[2]), int(i[3]), i[4], i[5], i[6]
 
-            # 결과
-            x1, y1, x2, y2, conf, cls, name = int(i[0]), int(i[1]), int(i[2]), int(i[3]), i[4], i[5], i[6]
+                #bounding box
+                cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)  # bounding box
+                cv2.putText(frame, name, (x1 - 5, y1 - 5), font, 0.5, (255, 0, 0), 1)  # class 이름
+                cv2.putText(frame, "{:.2f}".format(conf), (x1 + 5, y1 - 5), font, 0.5, (255, 0, 0), 1)  # 정확도
 
-            #bounding box
-            cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)  # bounding box
-            cv2.putText(frame, name, (x1 - 5, y1 - 5), font, 0.5, (255, 0, 0), 1)  # class 이름
-            cv2.putText(frame, "{:.2f}".format(conf), (x1 + 5, y1 - 5), font, 0.5, (255, 0, 0), 1)  # 정확도
+                # 보행자 좌표 표시
+                target_x = int((x1 + x2) / 2)  # 보행자 중심 x 좌표
+                target_y = int(y2)  # 보행자 하단 좌표
 
-            # 보행자 좌표 표시
-            target_x = int((x1 + x2) / 2)  # 보행자 중심 x 좌표
-            target_y = int(y2)  # 보행자 하단 좌표
+                # 보행자 픽셀 위치 표시
+                img = cv2.circle(img, (target_x, target_y), 10, (255, 0, 0), -1)
+                cv2.putText(img, "X:{} y:{}".format(target_x + 5, target_y + 5), (target_x + 10, target_y + 10), font, 0.5,
+                            (255, 0, 255), 1)
 
-            # 보행자 픽셀 위치 표시
-            img = cv2.circle(img, (target_x, target_y), 10, (255, 0, 0), -1)
-            cv2.putText(img, "X:{} y:{}".format(target_x + 5, target_y + 5), (target_x + 10, target_y + 10), font, 0.5,
-                        (255, 0, 255), 1)
-
-            cv2.imshow(cctv_name, frame)
-            out.write(frame)
+                cv2.imshow(cctv_name, frame)
+                out.write(frame)
         
         # ESC 누를시 종료
         k = cv2.waitKey(1) & 0xff
