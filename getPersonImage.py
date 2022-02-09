@@ -33,9 +33,9 @@ def writeVideo(Rtsp_addr,cctv_name,num):
 
     while True:
         ret, frame = video_capture.read()
-        bodys = model(frame, size=640)
         if ret:
             # yolo5
+            bodys = model(frame, size=640)
             for i in bodys.pandas().xyxy[0].values.tolist():
 
                 # 결과
