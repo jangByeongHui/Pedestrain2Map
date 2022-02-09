@@ -11,6 +11,8 @@ def writeVideo(Rtsp_addr,cctv_name,num):
     font = cv2.FONT_HERSHEY_SIMPLEX  # 글씨 폰트
 
     fps = 20
+    video_capture.set(3,1280)
+    video_capture.set(4,720)
 
     streaming_window_width = int(video_capture.get(3))
     streaming_window_height = int(video_capture.get(4))  
@@ -51,8 +53,8 @@ def writeVideo(Rtsp_addr,cctv_name,num):
                 target_y = int(y2)  # 보행자 하단 좌표
 
                 # 보행자 픽셀 위치 표시
-                img = cv2.circle(img, (target_x, target_y), 10, (255, 0, 0), -1)
-                cv2.putText(img, "X:{} y:{}".format(target_x + 5, target_y + 5), (target_x + 10, target_y + 10), font, 0.5,
+                frame = cv2.circle(frame, (target_x, target_y), 10, (255, 0, 0), -1)
+                cv2.putText(frame, "X:{} y:{}".format(target_x + 5, target_y + 5), (target_x + 10, target_y + 10), font, 0.5,
                             (255, 0, 255), 1)
 
                 cv2.imshow(cctv_name, frame)
