@@ -56,8 +56,8 @@ def writeVideo(Rtsp_addr,cctv_name,num):
                 frame = cv2.circle(frame, (target_x, target_y), 10, (255, 0, 0), -1)
                 cv2.putText(frame, "X:{} y:{}".format(target_x + 5, target_y + 5), (target_x + 10, target_y + 10), font, 0.5,
                             (255, 0, 255), 1)
-
-                cv2.imshow(cctv_name, frame)
+                temp_frame=cv2.resize(frame,dsize=(300,150))
+                cv2.imshow(cctv_name, temp_frame)
                 out.write(frame)
             else:
                 #비디오 못찾으면 재연결 시도
