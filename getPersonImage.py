@@ -56,19 +56,20 @@ def writeVideo(Rtsp_addr,cctv_name,num):
                 frame = cv2.circle(frame, (target_x, target_y), 10, (255, 0, 0), -1)
                 cv2.putText(frame, "X:{} y:{}".format(target_x + 5, target_y + 5), (target_x + 10, target_y + 10), font, 0.5,
                             (255, 0, 255), 1)
-                temp_frame=cv2.resize(frame,dsize=(300,150))
-                cv2.imshow(cctv_name, temp_frame)
                 out.write(frame)
-            else:
-                #비디오 못찾으면 재연결 시도
-                print(f'{cctv_name}:{Rtsp_addr} Not Found retry Reload')
-                video_capture = cv2.VideoCapture(Rtsp_addr)
-                video_capture.set(3, 1280)
-                video_capture.set(4, 720)
-                streaming_window_width = int(video_capture.get(3))
-                streaming_window_height = int(video_capture.get(4))
-                fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-                out = cv2.VideoWriter(path, fourcc, fps, (streaming_window_width, streaming_window_height))
+            #View CCTV
+            temp_frame=cv2.resize(frame,dsize=(300,150))
+            cv2.imshow(cctv_name, temp_frame)
+        else:
+            #비디오 못찾으면 재연결 시도
+            print(f'{cctv_name}:{Rtsp_addr} Not Found retry Reload')
+            video_capture = cv2.VideoCapture(Rtsp_addr)
+            video_capture.set(3, 1280)
+            video_capture.set(4, 720)
+            streaming_window_width = int(video_capture.get(3))
+            streaming_window_height = int(video_capture.get(4))
+            fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+            out = cv2.VideoWriter(path, fourcc, fps, (streaming_window_width, streaming_window_height))
 
 
         
