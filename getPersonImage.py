@@ -61,7 +61,7 @@ def writeVideo(Rtsp_addr,cctv_name,num):
                 out.write(frame)
             else:
                 #비디오 못찾으면 재연결 시도
-                print("{} Not Found retry Reload")
+                print(f'{cctv_name}:{Rtsp_addr} Not Found retry Reload')
                 video_capture = cv2.VideoCapture(Rtsp_addr)
                 video_capture.set(3, 1280)
                 video_capture.set(4, 720)
