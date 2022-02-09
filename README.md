@@ -56,3 +56,17 @@ python computeMat.py
 
 #결과 값으로 나온 Homography 행렬 값을 config_hd_2.py안에 각각의 CCTV별로 'homoMat'에 입력
 ```
+
+### 예시
+<img src ="asset/get_pedestrain.png">
+
+3. getPersonImage.py
+
+```
+# getPersonImage.py로 보행자 이미지 자동 수집
+
+#실행
+python getPersonImage.py
+
+#자동으로 CCTV_Person 폴더 안에 보행자 이미지들 저장
+```
