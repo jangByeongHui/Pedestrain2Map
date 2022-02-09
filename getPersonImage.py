@@ -63,7 +63,7 @@ def writeVideo(Rtsp_addr,cctv_name,num):
 
             temp_frame=cv2.resize(frame,dsize=(300,150))
             if person_found:
-                cv2.putText(temp_frame, "PersonDetect!", (150, 70), font, 1, (0, 0, 255), 1)  # 감지 표시
+                cv2.putText(temp_frame, "PersonDetect!", (30, 70), font, 1, (0, 0, 255), 1)  # 감지 표시
             cv2.imshow(cctv_name, temp_frame)
         else:
             #비디오 못찾으면 재연결 시도
