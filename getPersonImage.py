@@ -19,14 +19,9 @@ def writeVideo(Rtsp_addr,cctv_name,num):
     
    
     fileName = "{}_{}".format(cctv_name,str(currentTime.strftime('%Y_%m _%d_%H_%M_%S')))
-
-  
     path = './CCTV_Person/{}.mp4'.format(fileName)
-    
 
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-
-
     out = cv2.VideoWriter(path, fourcc, fps, (streaming_window_width, streaming_window_height))
 
     #yolov5
@@ -70,9 +65,17 @@ def writeVideo(Rtsp_addr,cctv_name,num):
         else:
             #비디오 못찾으면 에러 표시
             print(f'{cctv_name}:{Rtsp_addr} Not Found retry Reload')
+            cv2.putText(temp_frame, "Video Not Found!", (30, 70), font, 1, (0, 0, 255), 3)  # 감지 표시
+            cv2.imshow(cctv_name, temp_frame)
+            video_capture.release()
+            out.release()
             video_capture = cv2.VideoCapture(Rtsp_addr)
+
             video_capture.set(3, 1280)
             video_capture.set(4, 720)
+
+            fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+            out = cv2.VideoWriter(path, fourcc, fps, (streaming_window_width, streaming_window_height))
 
 
         
