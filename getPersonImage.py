@@ -59,8 +59,9 @@ def writeVideo(Rtsp_addr,cctv_name,num):
                 cv2.putText(frame, "X:{} y:{}".format(target_x + 5, target_y + 5), (target_x + 10, target_y + 10), font, 0.5,
                             (255, 0, 255), 1)
                 cv2.imwrite(f"./CCTV_Person/{cctv_name}/{cctv_name}_{str(datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S'))}.jpg",frame)
-                out.write(frame)
                 person_found=True
+            else:
+                out.write(frame)
 
             temp_frame=cv2.resize(frame,dsize=(300,150))
             if person_found:
