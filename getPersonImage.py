@@ -57,8 +57,8 @@ def writeVideo(Rtsp_addr,cctv_name,num):
                 cv2.putText(frame, "X:{} y:{}".format(target_x + 5, target_y + 5), (target_x + 10, target_y + 10), font, 0.5,
                             (255, 0, 255), 1)
                 out.write(frame)
-            #View CCTV
-            temp_frame=cv2.resize(frame,dsize=(300,150))
+                temp_frame=cv2.resize(frame,dsize=(300,150))
+                cv2.putText(temp_frame, "{PersonDetect!}", (150, 70), font, 1, (0, 0, 255), 1)  # 감지 표시
             cv2.imshow(cctv_name, temp_frame)
         else:
             #비디오 못찾으면 재연결 시도
