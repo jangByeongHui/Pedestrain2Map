@@ -35,6 +35,7 @@ def writeVideo(Rtsp_addr,cctv_name,num):
 
     while True:
         ret, frame = video_capture.read()
+        person_found=False
         if ret:
             # yolo5
             bodys = model(frame, size=640)
@@ -57,8 +58,11 @@ def writeVideo(Rtsp_addr,cctv_name,num):
                 cv2.putText(frame, "X:{} y:{}".format(target_x + 5, target_y + 5), (target_x + 10, target_y + 10), font, 0.5,
                             (255, 0, 255), 1)
                 out.write(frame)
-                temp_frame=cv2.resize(frame,dsize=(300,150))
-                cv2.putText(temp_frame, "{PersonDetect!}", (150, 70), font, 1, (0, 0, 255), 1)  # 감지 표시
+                person_found=True
+
+            temp_frame=cv2.resize(frame,dsize=(300,150))
+            if person_found:
+                cv2.putText(temp_frame, "PersonDetect!", (150, 70), font, 1, (0, 0, 255), 1)  # 감지 표시
             cv2.imshow(cctv_name, temp_frame)
         else:
             #비디오 못찾으면 재연결 시도
