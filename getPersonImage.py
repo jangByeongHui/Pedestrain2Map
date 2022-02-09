@@ -3,6 +3,7 @@ import datetime
 import multiprocessing
 from config_hd_2 import cams
 import torch
+import numpy as np
 
 def writeVideo(Rtsp_addr,cctv_name,num):
     currentTime = datetime.datetime.now()
@@ -65,8 +66,10 @@ def writeVideo(Rtsp_addr,cctv_name,num):
         else:
             #비디오 못찾으면 에러 표시
             print(f'{cctv_name}:{Rtsp_addr} Not Found retry Reload')
-            cv2.putText(temp_frame, "Video Not Found!", (30, 70), font, 1, (0, 0, 255), 3)  # 감지 표시
-            cv2.imshow(cctv_name, temp_frame)
+            Error_image=np.zeros((300,150,3),np.unint8)
+            cv2.putText(Error_image, "Video Not Found!", (30, 70), font, 1, (0, 0, 255), 3)  # 감지 표시
+            cv2.imshow(cctv_name, Error_image)
+
             video_capture.release()
             out.release()
             video_capture = cv2.VideoCapture(Rtsp_addr)
