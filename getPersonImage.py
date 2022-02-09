@@ -18,7 +18,7 @@ def writeVideo(Rtsp_addr,cctv_name,num):
     streaming_window_height = int(video_capture.get(4))  
     
    
-    fileName = "{}_{}".format(cctv_name,str(currentTime.strftime('%Y %m %d %H %M %S')))
+    fileName = "{}_{}".format(cctv_name,str(currentTime.strftime('%Y_%m _%d_%H_%M_%S')))
 
   
     path = './CCTV_Person/{}.mp4'.format(fileName)
@@ -32,6 +32,7 @@ def writeVideo(Rtsp_addr,cctv_name,num):
     #yolov5
     model = torch.hub.load('/home/ves/yolov5', 'custom', path='yolov5s.pt', source='local', device=num % 3)
     model.classes = [0]
+    model.conf=0.7
 
     while True:
         ret, frame = video_capture.read()
@@ -57,13 +58,13 @@ def writeVideo(Rtsp_addr,cctv_name,num):
                 frame = cv2.circle(frame, (target_x, target_y), 10, (255, 0, 0), -1)
                 cv2.putText(frame, "X:{} y:{}".format(target_x + 5, target_y + 5), (target_x + 10, target_y + 10), font, 0.5,
                             (255, 0, 255), 1)
-                cv2.imwrite(f"./CCTV_Person/{cctv_name}/{cctv_name}_{str(datetime.datetime.now().strftime('%Y %m %d %H %M %S'))}.jpg",frame)
+                cv2.imwrite(f"./CCTV_Person/{cctv_name}/{cctv_name}_{str(datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S'))}.jpg",frame)
                 out.write(frame)
                 person_found=True
 
             temp_frame=cv2.resize(frame,dsize=(300,150))
             if person_found:
-                cv2.putText(temp_frame, "PersonDetect!", (150, 70), font, 1, (0, 0, 255), 1)  # 감지 표시
+                cv2.putText(temp_frame, "PersonDetect!", (30, 70), font, 1, (0, 0, 255), 3)  # 감지 표시
             cv2.imshow(cctv_name, temp_frame)
         else:
             #비디오 못찾으면 에러 표시
