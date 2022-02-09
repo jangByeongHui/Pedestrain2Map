@@ -66,7 +66,7 @@ def writeVideo(Rtsp_addr,cctv_name,num):
         else:
             #비디오 못찾으면 에러 표시
             print(f'{cctv_name}:{Rtsp_addr} Not Found retry Reload')
-            Error_image=np.zeros((300,150,3),np.uint8)
+            Error_image=np.zeros((150,300,3),np.uint8)
             cv2.putText(Error_image, "Video Not Found!", (30, 70), font, 1, (0, 0, 255), 3)  # 감지 표시
             cv2.imshow(cctv_name, Error_image)
 
