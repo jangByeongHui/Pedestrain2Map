@@ -146,7 +146,7 @@ def send2server(data):
             if flag:
                 state=True
                 for num,(x,y) in enumerate(points):
-                    temp_list.append({'id':f'{cctv_name}_{num+1}','top':y,'left':y})
+                    temp_list.append({'id':f'{cctv_name}_{num+1}','top':x,'left':y})
 
         if state:
             print(json.dumps({'lists':temp_list}))
