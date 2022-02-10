@@ -158,8 +158,11 @@ def send2server(data):
 
 def main():
     # RTSP 주소 모음
+    Rtsp=[]
+    for cctv_name in cams.keys():
+        Rtsp.append(cams[cctv_name]['src'])
     #Rtsp = ["rtsp://admin:a1234567@1.255.252.7:500/cam/realmonitor?channel=1&subtype=0","rtsp://admin:a1234567@1.255.252.7:500/cam/realmonitor?channel=2&subtype=0","rtsp://admin:a1234567@1.255.252.7:500/cam/realmonitor?channel=3&subtype=0","rtsp://admin:a1234567@1.255.252.7:500/cam/realmonitor?channel=4&subtype=0","rtsp://admin:a1234567@1.255.252.7:500/cam/realmonitor?channel=5&subtype=0"]
-    Rtsp=["./data/Anyang2_SKV1_ch1_20220121090906.mp4","./data/Anyang2_SKV1_ch2_20220126165051_20220126165101.mp4","./data/Anyang2_SKV1_ch3_20220126165125_20220126165210.mp4","./data/Anyang2_SKV1_ch4_20220124132217_20220124132240.mp4","./data/Anyang2_SKV1_ch5_20220126165037_20220126165047.mp4"]
+    # Rtsp=["./data/Anyang2_SKV1_ch1_20220121090906.mp4","./data/Anyang2_SKV1_ch2_20220126165051_20220126165101.mp4","./data/Anyang2_SKV1_ch3_20220126165125_20220126165210.mp4","./data/Anyang2_SKV1_ch4_20220124132217_20220124132240.mp4","./data/Anyang2_SKV1_ch5_20220126165037_20220126165047.mp4"]
 
     #작업 결과 저장 dict
     manager = multiprocessing.Manager()
