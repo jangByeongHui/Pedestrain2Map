@@ -44,8 +44,8 @@ def writeVideo(Rtsp_addr,cctv_name,num):
 
                 #bounding box
                 cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)  # bounding box
-                cv2.putText(frame, name, (x1 - 5, y1 - 5), font, 0.5, (255, 0, 0), 1)  # class 이름
-                cv2.putText(frame, "{:.2f}".format(conf), (x1 + 5, y1 - 5), font, 0.5, (255, 0, 0), 1)  # 정확도
+                cv2.putText(frame, name, (x1 - 10, y1 - 5), font, 0.5, (255, 0, 0), 1)  # class 이름
+                cv2.putText(frame, "{:.2f}".format(conf), (x1 + 10, y1 - 5), font, 0.5, (255, 0, 0), 1)  # 정확도
 
                 # 보행자 좌표 표시
                 target_x = int((x1 + x2) / 2)  # 보행자 중심 x 좌표
