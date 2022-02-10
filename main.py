@@ -94,10 +94,9 @@ def multidetect(addr,cctv_name,homoMat,return_dict,num):
             print("Video({}) Not found".format(cctv_name))
             # f.write("{} Video({}) Not found\n".format(datetime.datetime.now(),cctv_name))
             cap.release()
-            out.release()
-            break
-            #cap = cv2.VideoCapture(addr)
-            #time.sleep(10)
+            # break
+            cap = cv2.VideoCapture(addr)
+            time.sleep(10)
         #ESC 누를 시 종료
         k = cv2.waitKey(1) & 0xff
         if k == 27:
