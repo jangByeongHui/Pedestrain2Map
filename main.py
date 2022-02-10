@@ -172,7 +172,7 @@ def main():
     work_list=[]
     # 멀티 프로세싱을 위한 작업 아규먼트 값
     for num,cctv_name in enumerate(cams.keys()):
-        work_list.append((Rtsp[num],cctv_name,cams[cctv_name]['homoMat'],return_dict,num))
+        work_list.append((cams[cctv_name]['src'],cctv_name,cams[cctv_name]['homoMat'],return_dict,num))
 
     # 병렬 프로세스 실행
     jobs=[]
