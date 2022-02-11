@@ -164,7 +164,7 @@ ENV*/
 
 # mkdocs documentation
 /site
-
+/runs/*
 # mypy
 .mypy_cache/
 

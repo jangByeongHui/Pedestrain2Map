@@ -129,7 +129,7 @@ def show_image(return_dict):
         stopTime = time.time()
         #print("View All result:{:.3f}s".format(stopTime - startTime))
         # ESC 누를 시 종료
-        k = cv2.waitKey(1000) & 0xff
+        k = cv2.waitKey(3000) & 0xff
         if k == 27:
             out.release()
             break
@@ -147,8 +147,8 @@ def send2server(data):
                     temp_list.append({'id':f'{cctv_name}_{num+1}','top':x,'left':y,'update':str(datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S'))})
 
         if state:
-            print(json.dumps({'lists':temp_list}))
-            put({'lists':temp_list})
+            # print(json.dumps({'lists':temp_list}))
+            put(f'{temp_list}')
     except Exception as e:
         print("Send2Server Error : {}".format(e))
         pass
