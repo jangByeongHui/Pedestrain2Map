@@ -1,20 +1,19 @@
-import requests
-import json
+# MQTTLens
 
+import paho.mqtt.client as mqtt
 
-# 관제 서버에 주차 상태를 전송
-def put(url1, data, headers):
+def put(data):
     try:
-        r = requests.put(url1, data=json.dumps(data), headers=headers)
-        if r.status_code != 200:  # 전송 성공시 상태 코드 출력
-            print(r.status_code)
-    # 오류 발생시 예외처리
-    except requests.exceptions.Timeout as errd:
-        print("Timeout Error : ", errd)
-    except requests.exceptions.ConnectionError as errc:
-        print("Error Connecting : ", errc)
-    except requests.exceptions.HTTPError as errb:
-        print("Http Error : ", errb)
-        # Any Error except upper exception
-    except requests.exceptions.RequestException as erra:
-        print("AnyException : ", erra)
+        topic='wm'
+        clientId=""
+        mqttHost="13.125.166.98"
+        mqttPort=1883
+
+        pubClt=mqtt.Client(clientId)
+        pubClt.connect(mqttHost,mqttPort)
+
+        pubClt.loop_start()
+        pubClt.publish(topic,data,1)
+        pubClt.loop_stop()
+    except:
+        print(f'failed publishing data:{data}')

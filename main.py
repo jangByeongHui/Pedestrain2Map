@@ -85,7 +85,7 @@ def multidetect(addr,cctv_name,homoMat,return_dict,num):
             #비디오 저장
             out.write(img)
             endTime=time.time()
-            print("MultiProcess({}):{:.3f}s\n".format(cctv_name,endTime-startTime))
+            # print("MultiProcess({}):{:.3f}s\n".format(cctv_name,endTime-startTime))
             # f.write("{} MultiProcess({}):{:.3f}s\n".format(datetime.datetime.now(),cctv_name,endTime-startTime))
             with open('result.csv', 'a', encoding='utf-8', newline='') as f:
                 wr =csv.writer(f)
@@ -150,7 +150,7 @@ def send2server(data):
 
         if state:
             print(json.dumps({'lists':temp_list}))
-            # put(url , {'lists':temp_list}, headers)
+            put({'lists':temp_list})
     except Exception as e:
         print("Send2Server Error : {}".format(e))
         pass
