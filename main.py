@@ -135,6 +135,7 @@ def show_image(return_dict):
             break
 
 #추후 서버 전송
+#MQTT 전송시에는 데이터를 문자열로 보내야 한다.
 def send2server(data):
     try:
         temp_list=[]
@@ -144,7 +145,7 @@ def send2server(data):
             if flag:
                 state=True
                 for num,(x,y) in enumerate(points):
-                    temp_list.append({'id':f'{cctv_name}_{num+1}','top':x,'left':y,'update':str(datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S'))})
+                    temp_list.append({'id':f'{cctv_name}_{num+1}','top':x,'left':y,'update':str(datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S'))})
 
         if state:
             # print(json.dumps({'lists':temp_list}))
