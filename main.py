@@ -1,6 +1,7 @@
 import cv2
 import time
 from config_hd_2 import cams
+from transmit_server import put
 import multiprocessing
 import numpy as np
 import torch
