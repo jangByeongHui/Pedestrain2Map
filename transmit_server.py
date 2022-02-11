@@ -4,8 +4,8 @@ import paho.mqtt.client as mqtt
 
 def put(data):
     try:
-        topic='wm'
-        clientId=""
+        topic='data'
+        clientId="tester1"
         mqttHost="13.125.166.98"
         mqttPort=1883
 

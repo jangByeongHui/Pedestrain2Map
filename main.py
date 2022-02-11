@@ -136,8 +136,6 @@ def show_image(return_dict):
 
 #추후 서버 전송
 def send2server(data):
-    headers = {'Content-Type': 'application/json'}
-    url = 'http://cheonho-api.watchmile.com/api/v1/parking/slot/'
     try:
         temp_list=[]
         state=None
