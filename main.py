@@ -120,7 +120,7 @@ def show_image(return_dict):
                 if flag:
                     for (x, y) in points:
                         Map = cv2.circle(Map, (x, y), 10, (0, 255, 0), -1) #지도위에 표시
-            temp_Map = cv2.resize(Map, dsize=(1280, 720))
+            temp_Map = cv2.resize(Map, dsize=(720, 480))
             cv2.imshow("Map", temp_Map)
             out.write(temp_Map)
         except:
@@ -128,7 +128,7 @@ def show_image(return_dict):
         stopTime = time.time()
         #print("View All result:{:.3f}s".format(stopTime - startTime))
         # ESC 누를 시 종료
-        k = cv2.waitKey(3000) & 0xff
+        k = cv2.waitKey(1) & 0xff
         if k == 27:
             out.release()
             break
