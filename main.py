@@ -14,7 +14,7 @@ def multidetect(addr,cctv_name,homoMat,return_dict,num):
 
     #yolov5
     # 로컬 레포에서 모델 로드(yolov5s.pt 가중치 사용, 추후 학습후 path에 변경할 가중치 경로 입력)
-    model = torch.hub.load('/home/ves/yolov5', 'custom', path='yolov5s.pt',source='local',device=num%3)
+    model = torch.hub.load('/home/ves/yolov5', 'custom', path='yolov5s.pt',source='local',device=0)
     # 깃허브에서 yolov5 레포에서 모델 로드
     #model = torch.hub.load('ultralytics/yolov5', 'custom', path='yolov5s.pt',device=num%3)
 
