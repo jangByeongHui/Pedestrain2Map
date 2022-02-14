@@ -143,7 +143,7 @@ def send2server(data):
             flag,points=data[cctv_name]
             if flag:
                 state=True
-                for num,(x,y) in enumerate(points):
+                for num,(y,x) in enumerate(points):
                     temp_list.append({'id':f'{cctv_name}_{num+1}','top':x,'left':y,'update':str(datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S'))})
 
         if state:
