@@ -119,7 +119,7 @@ def show_image(return_dict):
                 flag, points= return_dict[i] # flag: 보행자 검출 유무, points : 보행자 위치 좌표
                 if flag:
                     for (x, y) in points:
-                        Map = cv2.circle(Map, (x, y), 10, (0, 255, 0), -1) #지도위에 표시
+                        Map = cv2.circle(Map, (x, y), 30, (0, 255, 0), -1) #지도위에 표시
             temp_Map = cv2.resize(Map, dsize=(720, 480))
             cv2.imshow("Map", temp_Map)
             out.write(temp_Map)
@@ -156,7 +156,7 @@ def send2server(data):
 
 def main():
     # RTSP Test 영상
-    #Rtsp=["./data/Anyang2_SKV1_ch1_20220121090906.mp4","./data/Anyang2_SKV1_ch2_20220126165051_20220126165101.mp4","./data/Anyang2_SKV1_ch3_20220126165125_20220126165210.mp4","./data/Anyang2_SKV1_ch4_20220124132217_20220124132240.mp4","./data/Anyang2_SKV1_ch5_20220126165037_20220126165047.mp4"]
+    #Rtsp=["./data/Anyang2_SKV1_ch1_20220121090906.mp4","./data/Anyang2_SKV1_ch2_20220126165051_20220126165101.mp4","./data/Anyang2_SKV1_ch3_20220126165125_20220126165210.mp4"
     Rtsp=["./data/Anyang2_SKV1_ch1_20220121090906.mp4","./data/Anyang2_SKV1_ch2_20220126165051_20220126165101.mp4"]
     #작업 결과 저장 dict
     manager = multiprocessing.Manager()
