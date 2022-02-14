@@ -156,8 +156,8 @@ def send2server(data):
 
 def main():
     # RTSP Test 영상
-    Rtsp=["./data/Anyang2_SKV1_ch1_20220121090906.mp4","./data/Anyang2_SKV1_ch2_20220126165051_20220126165101.mp4","./data/Anyang2_SKV1_ch3_20220126165125_20220126165210.mp4","./data/Anyang2_SKV1_ch4_20220124132217_20220124132240.mp4","./data/Anyang2_SKV1_ch5_20220126165037_20220126165047.mp4"]
-
+    #Rtsp=["./data/Anyang2_SKV1_ch1_20220121090906.mp4","./data/Anyang2_SKV1_ch2_20220126165051_20220126165101.mp4","./data/Anyang2_SKV1_ch3_20220126165125_20220126165210.mp4","./data/Anyang2_SKV1_ch4_20220124132217_20220124132240.mp4","./data/Anyang2_SKV1_ch5_20220126165037_20220126165047.mp4"]
+    Rtsp=["./data/Anyang2_SKV1_ch1_20220121090906.mp4","./data/Anyang2_SKV1_ch2_20220126165051_20220126165101.mp4"]
     #작업 결과 저장 dict
     manager = multiprocessing.Manager()
     return_dict = manager.dict()
