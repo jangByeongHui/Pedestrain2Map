@@ -68,8 +68,8 @@ def multidetect(addr,cctv_name,homoMat,return_dict,num):
                 target_point=H@target_point
                 target_point=target_point/target_point[2]
                 target_point=list(target_point)
-                target_point[0]=round(int(target_point[0]), 0)
-                target_point[1]=round(int(target_point[1]), 0)
+                target_point[0]=round(int(target_point[0]), 0) # x - > left
+                target_point[1]=round(int(target_point[1]), 0) # y - > top
                 points.append((target_point[0],target_point[1]))
                 flag=True # 변환된 정보 저장
 
@@ -143,8 +143,8 @@ def send2server(data):
             flag,points=data[cctv_name]
             if flag:
                 state=True
-                for num,(y,x) in enumerate(points):
-                    temp_list.append({'id':f'{cctv_name}_{num+1}','top':x,'left':y,'update':str(datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S'))})
+                for num,(x,y) in enumerate(points):
+                    temp_list.append({'id':f'{cctv_name}_{num+1}','top':y,'left':x,'update':str(datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S'))})
 
         if state:
             # print(json.dumps({'lists':temp_list}))
