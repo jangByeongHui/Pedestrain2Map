@@ -101,6 +101,7 @@ def multidetect(addr,cctv_name,homoMat,return_dict,num):
         k = cv2.waitKey(1) & 0xff
         if k == 27:
             cap.release()
+            out.release()
             break
 
 def show_image(return_dict):
