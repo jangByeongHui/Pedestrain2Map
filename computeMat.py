@@ -1,8 +1,8 @@
 import cv2
 import numpy as np
 
-pts_src=np.float32([[1693,682],[1282,242],[851,223],[563,513]]) #cctv
-pts_dst=np.float32([[358,312],[574,310],[575,207],[389,204]]) #map
+pts_src=np.float32([[1770,895],[1553,334],[1518,233],[1163,215],[707,353]]) #cctv
+pts_dst=np.float32([[1905,832],[2200,1009],[2399,1173],[2401,953],[2141,753]]) #map
 
 pts_src=np.array(pts_src)
 pts_dst=np.array(pts_dst)

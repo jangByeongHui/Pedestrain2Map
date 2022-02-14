@@ -3,8 +3,8 @@ import cv2 as cv    # OpenCV import
 pos_list_CCTV=[]
 pos_list_MAP=[]
 #비교할 이미지 두장
-CCTV_PATH='CCTV_Person/CCTV07/CCTV07_2022_02_10_13_39_35.jpg'
-MAP_PATH='data/Anyang_B3.png'
+CCTV_PATH='CCTV_Person/CCTV05/CCTV05_2022_02_10_13_38_43.jpg'
+MAP_PATH='data/B3.png'
 
 CCTV = cv.imread(CCTV_PATH)
 MAP = cv.imread(MAP_PATH)
