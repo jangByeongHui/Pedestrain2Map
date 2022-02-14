@@ -6,7 +6,6 @@ import multiprocessing
 import numpy as np
 import torch
 import datetime
-import json
 import csv
 
 def multidetect(addr,cctv_name,homoMat,return_dict,num):
@@ -102,12 +101,11 @@ def multidetect(addr,cctv_name,homoMat,return_dict,num):
         k = cv2.waitKey(1) & 0xff
         if k == 27:
             cap.release()
-            out.release()
             break
 
 def show_image(return_dict):
 
-    Map_path = "./data/Anyang_B3.png"
+    Map_path = "./data/B3.png"
     path = "./runs/Map.mp4"
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
     out = cv2.VideoWriter(path, fourcc, 30, (1280,720))
