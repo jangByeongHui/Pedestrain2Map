@@ -103,7 +103,7 @@ def multidetect(addr,cctv_name,homoMat,return_dict,num):
             cap = cv2.VideoCapture(addr)
             time.sleep(10)
         #ESC 누를 시 종료
-        k = cv2.waitKey(1) & 0xff
+        k = cv2.waitKey(100) & 0xff
         if k == 27:
             cap.release()
             # out.release()
@@ -112,14 +112,14 @@ def multidetect(addr,cctv_name,homoMat,return_dict,num):
 def show_image(return_dict):
 
     Map_path = "./data/B3.png"
-    # path = "./runs/Map.mp4"
-    # fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-    # out = cv2.VideoWriter(path, fourcc, 30, (1280,720))
+    path = "./runs/Map.mp4"
+    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+    out = cv2.VideoWriter(path, fourcc, 30, (1280,720))
     while True:
         # startTime = time.time()
         Map = cv2.imread(Map_path)
         try:
-            send2server(return_dict,Map) #지도 표시전 서버에 보행자 위치 전송 및 지도 표시
+            send2server(return_dict,Map,out) #지도 표시전 서버에 보행자 위치 전송 및 지도 표시
         except:
             pass
         # stopTime = time.time()
@@ -135,7 +135,7 @@ def show_image(return_dict):
 def send2server(data,Map,out):
     try:
         temp_list=[]
-        state=None
+        state=False
         for cctv_name in data.keys():
             flag,points=data[cctv_name]
             if flag:
@@ -148,7 +148,7 @@ def send2server(data,Map,out):
         # out.write(temp_Map)
 
         if state:
-            # print(json.dumps({'lists':temp_list}))
+            print(f'state:{state} data:{temp_list}')
             put(f'{temp_list}')
     except Exception as e:
         print("Send2Server Error : {}".format(e))
@@ -167,8 +167,8 @@ def main():
     work_list=[]
     # 멀티 프로세싱을 위한 작업 아규먼트 값
     for num,cctv_name in enumerate(cams.keys()):
-        # work_list.append((cams[cctv_name]['src'],cctv_name,cams[cctv_name]['homoMat'],return_dict,num)) # config_hd_2에 정의된 주소
-        work_list.append((Rtsp[num], cctv_name, cams[cctv_name]['homoMat'], return_dict, num)) # 테스트 주소
+        work_list.append((cams[cctv_name]['src'],cctv_name,cams[cctv_name]['homoMat'],return_dict,num)) # config_hd_2에 정의된 주소
+        # work_list.append((Rtsp[num], cctv_name, cams[cctv_name]['homoMat'], return_dict, num)) # 테스트 주소
 
     # 병렬 프로세스 실행
     jobs=[]
