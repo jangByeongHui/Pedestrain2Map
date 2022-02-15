@@ -78,7 +78,7 @@ def multidetect(addr,cctv_name,homoMat,return_dict,num):
             if flag:
                 return_dict[cctv_name]=(flag,points)
             else:
-                return_dict[cctv_name]=(flag,(0,0))
+                return_dict[cctv_name]=(flag,[])
             temp_img = cv2.resize(img, dsize=(300, 180))
             cv2.imshow(cctv_name, temp_img)
 
@@ -125,7 +125,7 @@ def show_image(return_dict):
         # stopTime = time.time()
         #print("View All result:{:.3f}s".format(stopTime - startTime))
         # ESC 누를 시 종료
-        k = cv2.waitKey(1) & 0xff
+        k = cv2.waitKey(100) & 0xff
         if k == 27:
             # out.release()
             break
@@ -150,6 +150,9 @@ def send2server(data,Map,out):
         if state:
             print(f'state:{state} data:{temp_list}')
             put(f'{temp_list}')
+            # 결과 초기화
+            for cctv_name in data.keys():
+                data[cctv_name]=(False,[])
     except Exception as e:
         print("Send2Server Error : {}".format(e))
         pass
