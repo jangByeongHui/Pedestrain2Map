@@ -14,12 +14,13 @@ def multidetect(addr,cctv_name,homoMat,return_dict,num):
 
     #yolov5
     # 로컬 레포에서 모델 로드(yolov5s.pt 가중치 사용, 추후 학습후 path에 변경할 가중치 경로 입력)
-    model = torch.hub.load('./yolov5','custom',path='yolov5s.pt',source='local',force_reload=True,device=0)
+    model = torch.hub.load('/home/ves/yolov5', 'custom', path='yolov5s.pt',source='local',device=num%3)
     # 깃허브에서 yolov5 레포에서 모델 로드
     #model = torch.hub.load('ultralytics/yolov5', 'custom', path='yolov5s.pt',device=num%3)
 
     #검출하고자 하는 객체는 사람이기 때문에 coco data에서 검출할 객체를 사람으로만 특정(yolov5s.pt 사용시)
     model.classes=[0]
+    model.conf=0.7
 
     # 동영상 혹은 실시간 영상 캡쳐
     cap=cv2.VideoCapture(addr)
