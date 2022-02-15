@@ -17,118 +17,67 @@ model = torch.hub.load('/home/ves/yolov5', 'custom', path='yolov5s.pt', source='
 model.classes = [0]
 model.conf = 0.7
 
-def multidetect(img, cctv_name, homoMat, return_dict, num):
+def detect(img, cctv_name, homoMat, return_dict):
 
-    # 동영상 혹은 실시간 영상 캡쳐
-    cap = cv2.VideoCapture(addr)
-    # 결과 저장할 경로
-    # path = "./runs/{}.mp4".format(cctv_name)
-    # 코덱 설정
-    # fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-    # out = cv2.VideoWriter(path,fourcc,30,(int(cap.get(3)),int(cap.get(4))))
-    if ret:
+    # yolov5
+    # 추론
+    bodys = model(img, size=640)
 
-        # yolov5
-        # 추론
-        bodys = model(img, size=640)
+    flag = False
+    points = []
 
-        flag = False
-        points = []
+    # yolo5
+    for i in bodys.pandas().xyxy[0].values.tolist():
 
-        # yolo5
-        for i in bodys.pandas().xyxy[0].values.tolist():
-            # f.write("Video({}) found\n".format(cctv_name))
-            # f.write("{}\n".format(i))
+        # 결과
+        x1, y1, x2, y2, conf, cls, name = int(i[0]), int(i[1]), int(i[2]), int(i[3]), i[4], i[5], i[6]
 
-            # 결과
-            x1, y1, x2, y2, conf, cls, name = int(i[0]), int(i[1]), int(i[2]), int(i[3]), i[4], i[5], i[6]
+        cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 2)  # bounding box
+        cv2.putText(img, name, (x1 - 5, y1 - 5), font, 0.5, (255, 0, 0), 1)  # class 이름
+        cv2.putText(img, "{:.2f}".format(conf), (x1 + 5, y1 - 5), font, 0.5, (255, 0, 0), 1)  # 정확도
 
-            cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 2)  # bounding box
-            cv2.putText(img, name, (x1 - 5, y1 - 5), font, 0.5, (255, 0, 0), 1)  # class 이름
-            cv2.putText(img, "{:.2f}".format(conf), (x1 + 5, y1 - 5), font, 0.5, (255, 0, 0), 1)  # 정확도
+        # 보행자 좌표 표시
+        target_x = int((x1 + x2) / 2)  # 보행자 중심 x 좌표
+        target_y = int(y2)  # 보행자 하단 좌표
 
-            # 보행자 좌표 표시
-            target_x = int((x1 + x2) / 2)  # 보행자 중심 x 좌표
-            target_y = int(y2)  # 보행자 하단 좌표
+        # 보행자 픽셀 위치 표시
+        img = cv2.circle(img, (target_x, target_y), 10, (255, 0, 0), -1)
+        cv2.putText(img, "X:{} y:{}".format(target_x + 5, target_y + 5), (target_x + 10, target_y + 10), font,
+                    0.5, (255, 0, 255), 1)
 
-            # 보행자 픽셀 위치 표시
-            img = cv2.circle(img, (target_x, target_y), 10, (255, 0, 0), -1)
-            cv2.putText(img, "X:{} y:{}".format(target_x + 5, target_y + 5), (target_x + 10, target_y + 10), font,
-                        0.5, (255, 0, 255), 1)
+        # homography 변환
+        target_point = np.array([target_x, target_y, 1], dtype=int)
+        target_point.T
+        H = np.array(homoMat)
+        target_point = H @ target_point
+        target_point = target_point / target_point[2]
+        target_point = list(target_point)
+        target_point[0] = round(int(target_point[0]), 0)  # x - > left
+        target_point[1] = round(int(target_point[1]), 0)  # y - > top
+        points.append((target_point[0], target_point[1]))
+        flag = True  # 변환된 정보 저장
 
-            # homography 변환
-            target_point = np.array([target_x, target_y, 1], dtype=int)
-            target_point.T
-            H = np.array(homoMat)
-            target_point = H @ target_point
-            target_point = target_point / target_point[2]
-            target_point = list(target_point)
-            target_point[0] = round(int(target_point[0]), 0)  # x - > left
-            target_point[1] = round(int(target_point[1]), 0)  # y - > top
-            points.append((target_point[0], target_point[1]))
-            flag = True  # 변환된 정보 저장
-
-            # 변환된 보행자 픽셀 위치 저장
-            if flag:
-                return_dict[cctv_name] = (flag, points)
-            else:
-                return_dict[cctv_name] = (flag, [])
-            temp_img = cv2.resize(img, dsize=(300, 180))
-            cv2.imshow(cctv_name, temp_img)
-
-            # 비디오 저장
-            # out.write(img)
-            # endTime=time.time()
-
-            # print("MultiProcess({}):{:.3f}s\n".format(cctv_name,endTime-startTime))
-            # f.write("{} MultiProcess({}):{:.3f}s\n".format(datetime.datetime.now(),cctv_name,endTime-startTime))
-            # with open('result.csv', 'a', encoding='utf-8', newline='') as f:
-            #     wr =csv.writer(f)
-            #     wr.writerow([datetime,cctv_name,endTime-startTime,len(bodys.pandas().xyxy[0].values.tolist())])
-
+        # 변환된 보행자 픽셀 위치 저장
+        if flag:
+            return_dict[cctv_name] = (flag, points)
         else:
             return_dict[cctv_name] = (False, [])
-            print("Video({}) Not found".format(cctv_name))
-            Error_image = np.zeros((180, 300, 3), np.uint8)
-            cv2.putText(Error_image, "Video Not Found!", (20, 70), font, 1, (0, 0, 255), 3)  # 비디오 접속 끊어짐 표시
-            cv2.imshow(cctv_name, Error_image)
-            # f.write("{} Video({}) Not found\n".format(datetime.datetime.now(),cctv_name))
-            cap.release()
-            # break
-            cap = cv2.VideoCapture(addr)
-            time.sleep(10)
-        # ESC 누를 시 종료
-        k = cv2.waitKey(1) & 0xff
-        if k == 27:
-            cap.release()
-            # out.release()
-            break
-
+        temp_img = cv2.resize(img, dsize=(300, 180))
+        cv2.imshow(cctv_name, temp_img)
 
 def show_image(return_dict):
     Map_path = "./data/B3.png"
-    path = "./runs/Map.mp4"
-    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-    out = cv2.VideoWriter(path, fourcc, 30, (1280, 720))
-    while True:
-        # startTime = time.time()
-        Map = cv2.imread(Map_path)
-        try:
-            send2server(return_dict, Map, out)  # 지도 표시전 서버에 보행자 위치 전송 및 지도 표시
-        except:
-            pass
-        # stopTime = time.time()
-        # print("View All result:{:.3f}s".format(stopTime - startTime))
-        # ESC 누를 시 종료
-        k = cv2.waitKey(1) & 0xff
-        if k == 27:
-            # out.release()
-            break
+    Map = cv2.imread(Map_path)
+    try:
+        send2server(return_dict, Map)  # 지도 표시전 서버에 보행자 위치 전송 및 지도 표시
+    except:
+        pass
+
 
 
 # 추후 서버 전송
 # MQTT 전송시에는 데이터를 문자열로 보내야 한다.
-def send2server(data, Map, out):
+def send2server(data, Map):
     try:
         temp_list = []
         state = False
@@ -142,7 +91,6 @@ def send2server(data, Map, out):
                                       'update': str(datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S'))})
         temp_Map = cv2.resize(Map, dsize=(720, 480))
         cv2.imshow("Map", temp_Map)
-        # out.write(temp_Map)
 
         if state:
             print(f'state:{state} data:{temp_list}')
@@ -154,8 +102,19 @@ def send2server(data, Map, out):
 
 def main():
     global return_dict
+    caps=[]
+    cctv_names=list(cams.keys())
+    for cctv_name in cctv_names:
+        caps.append(cv2.VideoCapture(cams[cctv_name]['src']))
 
+    while True:
+        for num,cap in enumerate(caps):
+            ret , frame = cap.read()
 
+            if ret:
+                detect(frame,cctv_names[num],cams[cctv_names[num]]['homoMat'],return_dict)
+
+        show_image(return_dict)
 
 if __name__ == '__main__':
     main()
