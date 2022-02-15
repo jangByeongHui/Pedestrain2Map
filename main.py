@@ -93,6 +93,7 @@ def multidetect(addr,cctv_name,homoMat,return_dict,num):
             #     wr.writerow([datetime,cctv_name,endTime-startTime,len(bodys.pandas().xyxy[0].values.tolist())])
 
         else:
+            return_dict[cctv_name] = (False, [])
             print("Video({}) Not found".format(cctv_name))
             Error_image = np.zeros((180, 300, 3), np.uint8)
             cv2.putText(Error_image, "Video Not Found!", (20, 70), font, 1, (0, 0, 255), 3)  # 감지 표시
@@ -125,7 +126,7 @@ def show_image(return_dict):
         # stopTime = time.time()
         #print("View All result:{:.3f}s".format(stopTime - startTime))
         # ESC 누를 시 종료
-        k = cv2.waitKey(100) & 0xff
+        k = cv2.waitKey(1) & 0xff
         if k == 27:
             # out.release()
             break
@@ -150,9 +151,6 @@ def send2server(data,Map,out):
         if state:
             print(f'state:{state} data:{temp_list}')
             put(f'{temp_list}')
-            # 결과 초기화
-            for cctv_name in data.keys():
-                data[cctv_name]=(False,[])
     except Exception as e:
         print("Send2Server Error : {}".format(e))
         pass
