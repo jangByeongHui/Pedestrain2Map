@@ -159,7 +159,7 @@ def send2server(data,Map,out):
 def main():
     # RTSP Test 영상
     #Rtsp=["./data/Anyang2_SKV1_ch1_20220121090906.mp4","./data/Anyang2_SKV1_ch2_20220126165051_20220126165101.mp4","./data/Anyang2_SKV1_ch3_20220126165125_20220126165210.mp4"]
-    Rtsp=["./data/Anyang2_SKV1_ch1_20220121090906.mp4","./data/Anyang2_SKV1_ch2_20220126165051_20220126165101.mp4","./data/Anyang2_SKV1_ch3_20220126165125_20220126165210.mp4","data/Anyang2_SKV1_ch4_20220124132217_20220124132240.mp4","data/Anyang2_SKV1_ch5_20220126165037_20220126165047.mp4"]
+    # Rtsp=["./data/Anyang2_SKV1_ch1_20220121090906.mp4","./data/Anyang2_SKV1_ch2_20220126165051_20220126165101.mp4","./data/Anyang2_SKV1_ch3_20220126165125_20220126165210.mp4","data/Anyang2_SKV1_ch4_20220124132217_20220124132240.mp4","data/Anyang2_SKV1_ch5_20220126165037_20220126165047.mp4"]
     #작업 결과 저장 dict
     manager = multiprocessing.Manager()
     return_dict = manager.dict()
@@ -168,8 +168,8 @@ def main():
     work_list=[]
     # 멀티 프로세싱을 위한 작업 아규먼트 값
     for num,cctv_name in enumerate(cams.keys()):
-        #work_list.append((cams[cctv_name]['src'],cctv_name,cams[cctv_name]['homoMat'],return_dict,num)) # config_hd_2에 정의된 주소
-        work_list.append((Rtsp[num], cctv_name, cams[cctv_name]['homoMat'], return_dict, num)) # 테스트 주소
+        work_list.append((cams[cctv_name]['src'],cctv_name,cams[cctv_name]['homoMat'],return_dict,num)) # config_hd_2에 정의된 주소
+        #work_list.append((Rtsp[num], cctv_name, cams[cctv_name]['homoMat'], return_dict, num)) # 테스트 주소
 
     # 병렬 프로세스 실행
     jobs=[]
