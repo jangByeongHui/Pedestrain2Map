@@ -104,7 +104,7 @@ def multidetect(addr,cctv_name,homoMat,return_dict,num):
             cap = cv2.VideoCapture(addr)
             time.sleep(10)
         #ESC 누를 시 종료
-        k = cv2.waitKey(100) & 0xff
+        k = cv2.waitKey(1) & 0xff
         if k == 27:
             cap.release()
             # out.release()
