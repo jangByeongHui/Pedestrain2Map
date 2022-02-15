@@ -62,22 +62,16 @@ def detect(img, cctv_name, homoMat, return_dict):
             return_dict[cctv_name] = (flag, points)
         else:
             return_dict[cctv_name] = (False, [])
-        temp_img = cv2.resize(img, dsize=(300, 180))
-        cv2.imshow(cctv_name, temp_img)
-
-def show_image(return_dict):
-    Map_path = "./data/B3.png"
-    Map = cv2.imread(Map_path)
-    try:
-        send2server(return_dict, Map)  # 지도 표시전 서버에 보행자 위치 전송 및 지도 표시
-    except:
-        pass
+    temp_img = cv2.resize(img, dsize=(720, 480))
+    cv2.imshow(cctv_name, temp_img)
 
 
 
 # 추후 서버 전송
 # MQTT 전송시에는 데이터를 문자열로 보내야 한다.
-def send2server(data, Map):
+def send2server(data):
+    Map_path = "./data/B3.png"
+    Map = cv2.imread(Map_path)
     try:
         temp_list = []
         state = False
@@ -91,7 +85,6 @@ def send2server(data, Map):
                                       'update': str(datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S'))})
         temp_Map = cv2.resize(Map, dsize=(720, 480))
         cv2.imshow("Map", temp_Map)
-
         if state:
             print(f'state:{state} data:{temp_list}')
             put(f'{temp_list}')
@@ -108,13 +101,21 @@ def main():
         caps.append(cv2.VideoCapture(cams[cctv_name]['src']))
 
     while True:
+        send2server(return_dict)
+
         for num,cap in enumerate(caps):
             ret , frame = cap.read()
-
             if ret:
                 detect(frame,cctv_names[num],cams[cctv_names[num]]['homoMat'],return_dict)
+            else:
+                print("RSTP Not Found!")
+        k = cv2.waitKey(1) & 0xff
+        if k == 27:
+            for cap in caps:
+                cap.release()
+            break
 
-        show_image(return_dict)
+        
 
 if __name__ == '__main__':
     main()
