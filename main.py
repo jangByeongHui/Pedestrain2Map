@@ -96,7 +96,7 @@ def multidetect(addr,cctv_name,homoMat,return_dict,num):
             return_dict[cctv_name] = (False, [])
             print("Video({}) Not found".format(cctv_name))
             Error_image = np.zeros((180, 300, 3), np.uint8)
-            cv2.putText(Error_image, "Video Not Found!", (20, 70), font, 1, (0, 0, 255), 3)  # 감지 표시
+            cv2.putText(Error_image, "Video Not Found!", (20, 70), font, 1, (0, 0, 255), 3)  # 비디오 접속 끊어짐 표시
             cv2.imshow(cctv_name, Error_image)
             # f.write("{} Video({}) Not found\n".format(datetime.datetime.now(),cctv_name))
             cap.release()
