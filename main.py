@@ -6,7 +6,7 @@ import multiprocessing
 import numpy as np
 import torch
 import datetime
-import csv
+# import csv
 
 def multidetect(addr,cctv_name,homoMat,return_dict,num):
 
@@ -25,12 +25,12 @@ def multidetect(addr,cctv_name,homoMat,return_dict,num):
     # 동영상 혹은 실시간 영상 캡쳐
     cap=cv2.VideoCapture(addr)
     # 결과 저장할 경로
-    path = "./runs/{}.mp4".format(cctv_name)
+    #path = "./runs/{}.mp4".format(cctv_name)
     # 코덱 설정
-    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-    out = cv2.VideoWriter(path,fourcc,30,(int(cap.get(3)),int(cap.get(4))))
+    #fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+    #out = cv2.VideoWriter(path,fourcc,30,(int(cap.get(3)),int(cap.get(4))))
     while True:
-        startTime = time.time()
+        # startTime = time.time()
         #프레임 가져오기
         ret,img=cap.read()
         if ret:
@@ -83,16 +83,20 @@ def multidetect(addr,cctv_name,homoMat,return_dict,num):
             cv2.imshow(cctv_name, temp_img)
 
             #비디오 저장
-            out.write(img)
-            endTime=time.time()
+            # out.write(img)
+            # endTime=time.time()
+
             # print("MultiProcess({}):{:.3f}s\n".format(cctv_name,endTime-startTime))
             # f.write("{} MultiProcess({}):{:.3f}s\n".format(datetime.datetime.now(),cctv_name,endTime-startTime))
-            with open('result.csv', 'a', encoding='utf-8', newline='') as f:
-                wr =csv.writer(f)
-                wr.writerow([datetime,cctv_name,endTime-startTime,len(bodys.pandas().xyxy[0].values.tolist())])
+            # with open('result.csv', 'a', encoding='utf-8', newline='') as f:
+            #     wr =csv.writer(f)
+            #     wr.writerow([datetime,cctv_name,endTime-startTime,len(bodys.pandas().xyxy[0].values.tolist())])
 
         else:
             print("Video({}) Not found".format(cctv_name))
+            Error_image = np.zeros((180, 300, 3), np.uint8)
+            cv2.putText(Error_image, "Video Not Found!", (20, 70), font, 1, (0, 0, 255), 3)  # 감지 표시
+            cv2.imshow(cctv_name, Error_image)
             # f.write("{} Video({}) Not found\n".format(datetime.datetime.now(),cctv_name))
             cap.release()
             # break
@@ -102,41 +106,33 @@ def multidetect(addr,cctv_name,homoMat,return_dict,num):
         k = cv2.waitKey(1) & 0xff
         if k == 27:
             cap.release()
-            out.release()
+            # out.release()
             break
 
 def show_image(return_dict):
 
     Map_path = "./data/B3.png"
-    path = "./runs/Map.mp4"
-    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-    out = cv2.VideoWriter(path, fourcc, 30, (1280,720))
+    # path = "./runs/Map.mp4"
+    # fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+    # out = cv2.VideoWriter(path, fourcc, 30, (1280,720))
     while True:
-        startTime = time.time()
+        # startTime = time.time()
         Map = cv2.imread(Map_path)
         try:
-            send2server(return_dict) #지도 표시전 서버에 보행자 위치 전송
-            for i in return_dict.keys():
-                flag, points= return_dict[i] # flag: 보행자 검출 유무, points : 보행자 위치 좌표
-                if flag:
-                    for (x, y) in points:
-                        Map = cv2.circle(Map, (x, y), 30, (0, 255, 0), -1) #지도위에 표시
-            temp_Map = cv2.resize(Map, dsize=(720, 480))
-            cv2.imshow("Map", temp_Map)
-            out.write(temp_Map)
+            send2server(return_dict,Map) #지도 표시전 서버에 보행자 위치 전송 및 지도 표시
         except:
             pass
-        stopTime = time.time()
+        # stopTime = time.time()
         #print("View All result:{:.3f}s".format(stopTime - startTime))
         # ESC 누를 시 종료
         k = cv2.waitKey(1) & 0xff
         if k == 27:
-            out.release()
+            # out.release()
             break
 
 #추후 서버 전송
 #MQTT 전송시에는 데이터를 문자열로 보내야 한다.
-def send2server(data):
+def send2server(data,Map,out):
     try:
         temp_list=[]
         state=None
@@ -145,7 +141,11 @@ def send2server(data):
             if flag:
                 state=True
                 for num,(x,y) in enumerate(points):
+                    Map = cv2.circle(Map, (x, y), 30, (0, 255, 0), -1)  # 지도위에 표시
                     temp_list.append({'id':f'{cctv_name}_{num+1}','top':y,'left':x,'update':str(datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S'))})
+        temp_Map = cv2.resize(Map, dsize=(720, 480))
+        cv2.imshow("Map", temp_Map)
+        # out.write(temp_Map)
 
         if state:
             # print(json.dumps({'lists':temp_list}))
@@ -158,7 +158,7 @@ def send2server(data):
 def main():
     # RTSP Test 영상
     #Rtsp=["./data/Anyang2_SKV1_ch1_20220121090906.mp4","./data/Anyang2_SKV1_ch2_20220126165051_20220126165101.mp4","./data/Anyang2_SKV1_ch3_20220126165125_20220126165210.mp4"]
-    Rtsp=["./data/Anyang2_SKV1_ch1_20220121090906.mp4","./data/Anyang2_SKV1_ch2_20220126165051_20220126165101.mp4","./data/Anyang2_SKV1_ch3_20220126165125_20220126165210.mp4","data/Anyang2_SKV1_ch4_20220124132217_20220124132240.mp4","data/Anyang2_SKV1_ch5_20220126165037_20220126165047.mp4"]
+    # Rtsp=["./data/Anyang2_SKV1_ch1_20220121090906.mp4","./data/Anyang2_SKV1_ch2_20220126165051_20220126165101.mp4","./data/Anyang2_SKV1_ch3_20220126165125_20220126165210.mp4","data/Anyang2_SKV1_ch4_20220124132217_20220124132240.mp4","data/Anyang2_SKV1_ch5_20220126165037_20220126165047.mp4"]
     #작업 결과 저장 dict
     manager = multiprocessing.Manager()
     return_dict = manager.dict()
