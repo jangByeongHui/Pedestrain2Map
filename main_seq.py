@@ -108,6 +108,9 @@ def main():
             if ret:
                 detect(frame,cctv_names[num],cams[cctv_names[num]]['homoMat'],return_dict)
             else:
+                Error_image = np.zeros((480, 720, 3), np.uint8)
+                cv2.putText(Error_image, "Video Not Found!", (20, 70), font, 1, (0, 0, 255), 3)  # 비디오 접속 끊어짐 표시
+                cv2.imshow(cctv_names[num], Error_image)
                 print("RSTP Not Found!")
         k = cv2.waitKey(1) & 0xff
         if k == 27:
