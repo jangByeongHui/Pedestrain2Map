@@ -12,12 +12,13 @@ def View_cam(cctv_name,cctv_addr):
         ret,frame = cap.read()
 
         if ret:
-            frame = cv2.resize(frame,dsize=(1280,720))
+            frame = cv2.resize(frame,dsize=(720,480))
             cv2.imshow(cctv_name,frame)
         else:
             Error_image = np.zeros((720, 1280, 3), np.uint8)
-            cv2.putText(Error_image, "Video Not Found!", (0, 310), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 3)  # 비디오 접속 끊어짐 표시
+            cv2.putText(Error_image, "Video Not Found!", (340, 240), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 3)  # 비디오 접속 끊어짐 표시
             cv2.imshow(cctv_name, Error_image)
+            cap = cv2.VideoCapture(cctv_addr)
 
         k = cv2.waitKey(1) & 0xff
         if k == 27:
