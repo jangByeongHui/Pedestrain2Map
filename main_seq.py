@@ -7,8 +7,6 @@ import torch
 import datetime
 import multiprocessing
 
-return_dict = dict()
-
 def getFrame(cctv_addr,cctv_name,return_dict):
     font = cv2.FONT_HERSHEY_SIMPLEX  # 글씨 폰트
     cap = cv2.VideoCapture(cctv_addr)
@@ -20,6 +18,11 @@ def getFrame(cctv_addr,cctv_name,return_dict):
             Error_image = np.zeros((720, 1920, 3), np.uint8)
             cv2.putText(Error_image, "Video Not Found!", (20, 70), font, 1, (0, 0, 255), 3)  # 비디오 접속 끊어짐 표시
             return_dict['img'][cctv_name] = Error_image
+            #retry
+            cap = cv2.VideoCapture(cctv_addr)
+        k = cv2.waitKey(1) & 0xff
+        if k == 27:
+            break
 
 
 
@@ -30,7 +33,7 @@ def detect(return_dict):
     # 로컬 레포에서 모델 로드(yolov5s.pt 가중치 사용, 추후 학습후 path에 변경할 가중치 경로 입력)
     # 깃허브에서 yolov5 레포에서 모델 로드
     # model = torch.hub.load('ultralytics/yolov5', 'custom', path='yolov5s.pt',device=num%3)
-    model = torch.hub.load('/home/ves/yolov5', 'custom', path='yolov5s.pt', source='local', device=2)
+    model = torch.hub.load('yolov5', 'custom', path='yolov5s.pt', source='local', device=0)
     # 검출하고자 하는 객체는 사람이기 때문에 coco data에서 검출할 객체를 사람으로만 특정(yolov5s.pt 사용시)
     model.classes = [0]
     model.conf = 0.7
@@ -74,15 +77,16 @@ def detect(return_dict):
                 points.append((target_point[0], target_point[1]))
                 flag = True  # 변환된 정보 저장
 
-                # 변환된 보행자 픽셀 위치 저장
-                if flag:
-                    return_dict[cctv_name] = (flag, points)
-                else:
-                    return_dict[cctv_name] = (False, [])
+            # 변환된 보행자 픽셀 위치 저장
+            if flag:
+                return_dict[cctv_name] = (flag, points)
+            else:
+                return_dict[cctv_name] = (False, [])
             temp_img = cv2.resize(img, dsize=(720, 480))
             cv2.imshow(cctv_name, temp_img)
-            k = cv2.waitKey(1) & 0xff
+
         send2server(return_dict)
+        k = cv2.waitKey(1) & 0xff
         if k == 27:
             break
 
@@ -110,6 +114,7 @@ def send2server(data):
             print(f'state:{state} data:{temp_list}')
             put(f'{temp_list}')
     except Exception as e:
+        print(f'state:{state} data:{temp_list}')
         print("Send2Server Error : {}".format(e))
         pass
 
@@ -118,7 +123,10 @@ def main():
     # 작업 결과 저장 dict
     manager = multiprocessing.Manager()
     return_dict = manager.dict()
-    return_dict['img']=manager.dict()
+    return_dict['img'] = manager.dict()
+    #init
+    for cctv_name in cams.keys():
+        return_dict['img'][cctv_name] = np.zeros((720, 1920, 3), np.uint8)
     work_lists=[]
     jobs=[]
 
@@ -130,7 +138,7 @@ def main():
         jobs.append(p)
         p.start()
     else:
-        p = multiprocessing.Process(target=detect, args=(return_dict))
+        p = multiprocessing.Process(target=detect, args=(return_dict,))
         jobs.append(p)
         p.start()
 
