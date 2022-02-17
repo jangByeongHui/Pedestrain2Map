@@ -126,7 +126,7 @@ def main():
     return_dict['img'] = manager.dict()
     #init
     for cctv_name in cams.keys():
-        return_dict['img'][cctv_name] = np.zeros((720, 1920, 3), np.uint8)
+        return_dict['img'][cctv_name] = np.zeros((1080, 1920, 3), np.uint8)
     work_lists=[]
     jobs=[]
 
