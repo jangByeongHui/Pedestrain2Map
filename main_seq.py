@@ -22,6 +22,7 @@ def getFrame(cctv_addr,cctv_name,return_dict):
             cap = cv2.VideoCapture(cctv_addr)
         k = cv2.waitKey(1) & 0xff
         if k == 27:
+            cap.release()
             break
 
 
@@ -37,6 +38,11 @@ def detect(return_dict):
     # 검출하고자 하는 객체는 사람이기 때문에 coco data에서 검출할 객체를 사람으로만 특정(yolov5s.pt 사용시)
     model.classes = [0]
     model.conf = 0.7
+    window_width=320
+    window_height=270
+    for num,cctv_name in enumerate(cams.keys()):
+        cv2.namedWindow(cctv_name)
+        cv2.moveWindow(cctv_name,320*(num%6),270*(num//6))
     while True:
         for cctv_name in cams.keys():
             # 추론
@@ -82,9 +88,8 @@ def detect(return_dict):
                 return_dict[cctv_name] = (flag, points)
             else:
                 return_dict[cctv_name] = (False, [])
-            temp_img = cv2.resize(img, dsize=(720, 480))
+            temp_img = cv2.resize(img, dsize=(window_width, window_height))
             cv2.imshow(cctv_name, temp_img)
-
         send2server(return_dict)
         k = cv2.waitKey(1) & 0xff
         if k == 27:
