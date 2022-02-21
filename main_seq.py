@@ -11,7 +11,10 @@ def getFrame(cctv_addr,cctv_name,return_dict):
     font = cv2.FONT_HERSHEY_SIMPLEX  # 글씨 폰트
     cap = cv2.VideoCapture(cctv_addr)
     while True:
+        start_time = time.time()
         ret,frame = cap.read()
+        end_time = time.time()
+        print(f'Get {cctv_name} a frame - {round(end_time - start_time, 3)} s')
         if ret:
             return_dict['img'][cctv_name] = frame
         else:
@@ -40,15 +43,19 @@ def detect(return_dict):
     model.conf = 0.7
     window_width=320
     window_height=270
+    # CCTV 화면 정렬
     for num,cctv_name in enumerate(cams.keys()):
         cv2.namedWindow(cctv_name)
         cv2.moveWindow(cctv_name,320*(num%6),270*(num//6))
+    # CCTV 화면 추론
     while True:
         for cctv_name in cams.keys():
             # 추론
             img = return_dict['img'][cctv_name]
+            start_time=time.time()
             bodys = model(img, size=640)
-
+            end_time=time.time()
+            print(f'yolov5 {cctv_name} img 추론 시간 - {round(end_time - start_time, 3)} s')
             flag = False
             points = []
 
