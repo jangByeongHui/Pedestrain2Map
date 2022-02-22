@@ -1,4 +1,5 @@
 paho-mqtt
+python-telegram-bot
 
 # pip install -r requirements.txt
 

@@ -6,6 +6,7 @@ import numpy as np
 import torch
 import datetime
 import multiprocessing
+import telegram
 
 def getFrame(cctv_addr,cctv_name,return_dict):
     font = cv2.FONT_HERSHEY_SIMPLEX  # 글씨 폰트
@@ -107,6 +108,8 @@ def detect(return_dict):
 # 추후 서버 전송
 # MQTT 전송시에는 데이터를 문자열로 보내야 한다.
 def send2server(data):
+    bot = telegram.Bot(token="5137138184:AAEf4mPnuYIz2YT5HWGACYy5cKHsgo68OPY")
+    chat_id = 1930625013
     Map_path = "./data/B3.png"
     Map = cv2.imread(Map_path)
     try:
@@ -120,6 +123,7 @@ def send2server(data):
                     Map = cv2.circle(Map, (x, y), 30, (0, 255, 0), -1)  # 지도위에 표시
                     temp_list.append({'id': f'{cctv_name}_{num + 1}', 'top': y, 'left': x,
                                       'update': str(datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S'))})
+                bot.sendMessage(chat_id=chat_id, text=f'cctv : {cctv_name} found {num+1} people!')
         temp_Map = cv2.resize(Map, dsize=(720, 480))
         cv2.imshow("Map", temp_Map)
         if state:
