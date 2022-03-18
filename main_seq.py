@@ -117,6 +117,7 @@ def send2server(data):
     bot = telegram.Bot(token="5137138184:AAEf4mPnuYIz2YT5HWGACYy5cKHsgo68OPY")
     chat_id = 1930625013
     Map_path = "./data/B3.png"
+
     Map = cv2.imread(Map_path)
     try:
         temp_list = []
@@ -146,14 +147,19 @@ def main():
     manager = multiprocessing.Manager()
     return_dict = manager.dict()
     return_dict['img'] = manager.dict()
+    Rtsp = ["./data/Anyang2_SKV1_ch1_20220121090906.mp4", "./data/Anyang2_SKV1_ch2_20220126165051_20220126165101.mp4",
+            "./data/Anyang2_SKV1_ch3_20220126165125_20220126165210.mp4",
+            "data/Anyang2_SKV1_ch4_20220124132217_20220124132240.mp4",
+            "data/Anyang2_SKV1_ch5_20220126165037_20220126165047.mp4"]
     #init
     for cctv_name in cams.keys():
         return_dict['img'][cctv_name] = np.zeros((1080, 1920, 3), np.uint8)
     work_lists=[]
     jobs=[]
 
-    for cctv_name in cams.keys():
-        work_lists.append((cams[cctv_name]['src'],cctv_name,return_dict))
+    for num,cctv_name in enumerate(cams.keys()):
+        #work_lists.append((cams[cctv_name]['src'],cctv_name,return_dict))
+        work_lists.append((Rtsp[num], cctv_name, return_dict))
 
     for i,work in enumerate(work_lists):
         p = multiprocessing.Process(target=getFrame, args=work)
