@@ -6,7 +6,7 @@ import numpy as np
 import torch
 import datetime
 import multiprocessing
-import telegram
+# import telegram
 
 def getFrame(cctv_addr,cctv_name,return_dict):
     font = cv2.FONT_HERSHEY_SIMPLEX  # 글씨 폰트
@@ -15,7 +15,7 @@ def getFrame(cctv_addr,cctv_name,return_dict):
         start_time = time.time()
         ret,frame = cap.read()
         end_time = time.time()
-        print(f'{cctv_name} 프레임 가져오는 시간 - {round(end_time - start_time, 3)} s')
+        # print(f'{cctv_name} 프레임 가져오는 시간 - {round(end_time - start_time, 3)} s')
         if ret:
             return_dict['img'][cctv_name] = frame
         else:
@@ -24,10 +24,10 @@ def getFrame(cctv_addr,cctv_name,return_dict):
             return_dict['img'][cctv_name] = Error_image
             #retry
             cap = cv2.VideoCapture(cctv_addr)
-        k = cv2.waitKey(1) & 0xff
-        if k == 27:
-            cap.release()
-            break
+        # k = cv2.waitKey(1) & 0xff
+        # if k == 27:
+        #     cap.release()
+        #     break
 
 
 
@@ -44,10 +44,10 @@ def detect(return_dict):
     model.conf = 0.7
     window_width=320
     window_height=270
-    # CCTV 화면 정렬
-    for num,cctv_name in enumerate(cams.keys()):
-        cv2.namedWindow(cctv_name)
-        cv2.moveWindow(cctv_name,320*(num%6),270*(num//6))
+    # # CCTV 화면 정렬
+    # for num,cctv_name in enumerate(cams.keys()):
+    #     cv2.namedWindow(cctv_name)
+    #     cv2.moveWindow(cctv_name,320*(num%6),270*(num//6))
     # CCTV 화면 추론
     while True:
         Total_start_time = time.time()
@@ -97,8 +97,8 @@ def detect(return_dict):
                 return_dict[cctv_name] = (flag, points)
             else:
                 return_dict[cctv_name] = (False, [])
-            temp_img = cv2.resize(img, dsize=(window_width, window_height))
-            cv2.imshow(cctv_name, temp_img)
+            # temp_img = cv2.resize(img, dsize=(window_width, window_height))
+            # cv2.imshow(cctv_name, temp_img)
         start_time = time.time()
         send2server(return_dict)
         end_time = time.time()
@@ -114,8 +114,8 @@ def detect(return_dict):
 # 추후 서버 전송
 # MQTT 전송시에는 데이터를 문자열로 보내야 한다.
 def send2server(data):
-    bot = telegram.Bot(token="5137138184:AAEf4mPnuYIz2YT5HWGACYy5cKHsgo68OPY")
-    chat_id = 1930625013
+    # bot = telegram.Bot(token="5137138184:AAEf4mPnuYIz2YT5HWGACYy5cKHsgo68OPY")
+    # chat_id = 1930625013
     Map_path = "./data/B3.png"
 
     Map = cv2.imread(Map_path)
@@ -130,7 +130,7 @@ def send2server(data):
                     Map = cv2.circle(Map, (x, y), 30, (0, 255, 0), -1)  # 지도위에 표시
                     temp_list.append({'id': f'{cctv_name}_{num + 1}', 'top': y, 'left': x,
                                       'update': str(datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S'))})
-                bot.sendMessage(chat_id=chat_id, text=f'cctv : {cctv_name} found {num+1} people!')
+                # bot.sendMessage(chat_id=chat_id, text=f'cctv : {cctv_name} found {num+1} people!')
         # temp_Map = cv2.resize(Map, dsize=(720, 480))
         # cv2.imshow("Map", temp_Map)
         if state:
