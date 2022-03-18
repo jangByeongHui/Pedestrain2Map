@@ -1,7 +1,9 @@
 # MQTTLens
 
 import paho.mqtt.client as mqtt
+import datetime
 
+# data = [{'id': f'{cctv_name}_{num + 1}', 'top': y, 'left': x,'update': str(datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S'))}]
 def put(data):
     try:
         topic='data'
@@ -18,3 +20,8 @@ def put(data):
         print(f'Success publishing data')
     except Exception as e:
         print(f'failed publishing data: {e}')
+
+
+if __name__ == '__main__':
+    while True:
+        put([{'id': "cctvtest_1", 'top': 2000, 'left': 1500,'update': str(datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S-%f'))}])
