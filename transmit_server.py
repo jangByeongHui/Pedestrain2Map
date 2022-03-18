@@ -24,4 +24,4 @@ def put(data):
 
 if __name__ == '__main__':
     while True:
-        put([{'id': "cctvtest_1", 'top': 2000, 'left': 1500,'update': str(datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S-%f'))}])
+        put("[{'id': 'CCTV20_1', 'top': 1805, 'left': 2438, 'update': '2022-03-18-16-40-05'}, {'id': 'CCTV21_1', 'top': 2305, 'left': 1221, 'update': '2022-03-18-16-40-05'}, {'id': 'CCTV22_1', 'top': 1390, 'left': 949, 'update': '2022-03-18-16-40-05'}, {'id': 'CCTV22_2', 'top': 1421, 'left': 995, 'update': '2022-03-18-16-40-05'}]")
