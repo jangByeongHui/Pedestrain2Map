@@ -15,7 +15,7 @@ def getFrame(cctv_addr,cctv_name,return_dict):
         start_time = time.time()
         ret,frame = cap.read()
         end_time = time.time()
-        print(f'Get {cctv_name} a frame - {round(end_time - start_time, 3)} s')
+        print(f'{cctv_name} 프레임 가져오는 시간 - {round(end_time - start_time, 3)} s')
         if ret:
             return_dict['img'][cctv_name] = frame
         else:
@@ -50,6 +50,7 @@ def detect(return_dict):
         cv2.moveWindow(cctv_name,320*(num%6),270*(num//6))
     # CCTV 화면 추론
     while True:
+        Total_start_time = time.time()
         for cctv_name in cams.keys():
             # 추론
             img = return_dict['img'][cctv_name]
@@ -98,10 +99,15 @@ def detect(return_dict):
                 return_dict[cctv_name] = (False, [])
             temp_img = cv2.resize(img, dsize=(window_width, window_height))
             cv2.imshow(cctv_name, temp_img)
+        start_time = time.time()
         send2server(return_dict)
+        end_time = time.time()
+        print(f'서버전송시간 - {round(end_time - start_time, 3)} s')
         k = cv2.waitKey(1) & 0xff
         if k == 27:
             break
+        Total_end_time_time = time.time()
+        print(f'전체처리시간 - {round(end_time - start_time, 3)} s')
 
 
 
