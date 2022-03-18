@@ -103,11 +103,11 @@ def detect(return_dict):
         send2server(return_dict)
         end_time = time.time()
         print(f'서버전송시간 - {round(end_time - start_time, 3)} s')
-        k = cv2.waitKey(1) & 0xff
-        if k == 27:
-            break
-        Total_end_time_time = time.time()
-        print(f'전체처리시간 - {round(end_time - start_time, 3)} s')
+        # k = cv2.waitKey(1) & 0xff
+        # if k == 27:
+        #     break
+        Total_end_time = time.time()
+        print(f'전체처리시간 - {round(Total_end_time - Total_start_time, 3)} s')
 
 
 
@@ -130,8 +130,8 @@ def send2server(data):
                     temp_list.append({'id': f'{cctv_name}_{num + 1}', 'top': y, 'left': x,
                                       'update': str(datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S'))})
                 bot.sendMessage(chat_id=chat_id, text=f'cctv : {cctv_name} found {num+1} people!')
-        temp_Map = cv2.resize(Map, dsize=(720, 480))
-        cv2.imshow("Map", temp_Map)
+        # temp_Map = cv2.resize(Map, dsize=(720, 480))
+        # cv2.imshow("Map", temp_Map)
         if state:
             print(f'state:{state} data:{temp_list}')
             put(f'{temp_list}')
