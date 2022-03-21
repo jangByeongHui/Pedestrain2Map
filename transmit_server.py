@@ -3,8 +3,6 @@
 import paho.mqtt.client as mqtt
 import time
 import multiprocessing
-import keyboard
-
 # data = [{'id': f'{cctv_name}_{num + 1}', 'top': y, 'left': x,'update': str(datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S'))}]
 start_time = 0
 end_time = 0
