@@ -19,7 +19,7 @@ def put(data):
         pubClt.loop_start()
         pubClt.publish(topic,data,1)
         pubClt.loop_stop()
-        print(f'Success publishing data {data}')
+        print(f'Success publishing data')
     except Exception as e:
         print(f'failed publishing data: {e}')
 
