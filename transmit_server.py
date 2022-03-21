@@ -24,11 +24,8 @@ def put(data):
         print(f'failed publishing data: {e}')
 
 def on_message(client, userdata, message):
-    print("message received ", str(message.payload.decode("utf-8")))
-    print("message topic=", message.topic)
-    print("message qos=", message.qos)
-    print("message retain flag=", message.retain)
-    print(f'spend Time : {int((time.time()-float(message.payload))*1000)} ms')
+    print("\nmessage received ", str(message.payload.decode("utf-8")))
+    print(f'spend Time : {int((time.time()-float(message.payload))*1000)} ms\n')
 
 
 def sub():
