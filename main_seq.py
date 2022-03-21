@@ -6,15 +6,20 @@ import numpy as np
 import torch
 import datetime
 import multiprocessing
+import csv
 # import telegram
-
+Frame_time = 0
+Yolo_time = 0
+Homography_time = 0
 def getFrame(cctv_addr,cctv_name,return_dict):
+    global Frame_time
     font = cv2.FONT_HERSHEY_SIMPLEX  # 글씨 폰트
     cap = cv2.VideoCapture(cctv_addr)
     while True:
         start_time = time.time()
         ret,frame = cap.read()
         end_time = time.time()
+        Frame_time = end_time-start_time
         # print(f'{cctv_name} 프레임 가져오는 시간 - {round(end_time - start_time, 3)} s')
         if ret:
             return_dict['img'][cctv_name] = frame
@@ -33,6 +38,7 @@ def getFrame(cctv_addr,cctv_name,return_dict):
 
 def detect(return_dict):
     font = cv2.FONT_HERSHEY_SIMPLEX  # 글씨 폰트
+    global Yolo_time,Frame_time,Homography_time
     # yolov5
     # yolov5
     # 로컬 레포에서 모델 로드(yolov5s.pt 가중치 사용, 추후 학습후 path에 변경할 가중치 경로 입력)
@@ -50,18 +56,19 @@ def detect(return_dict):
     #     cv2.moveWindow(cctv_name,320*(num%6),270*(num//6))
     # CCTV 화면 추론
     while True:
-        Total_start_time = time.time()
         for cctv_name in cams.keys():
             # 추론
             img = return_dict['img'][cctv_name]
-            start_time=time.time()
+            yolo_start_time=time.time()
             bodys = model(img, size=640)
-            end_time=time.time()
-            print(f'yolov5 {cctv_name} img 추론 시간 - {round(end_time - start_time, 3)} s')
+            yolo_end_time=time.time()
+            Yolo_time = yolo_end_time-yolo_start_time
+            #print(f'yolov5 {cctv_name} img 추론 시간 - {round(end_time - start_time, 3)} s')
             flag = False
             points = []
 
             # yolo5
+            homo_start_time = time.time()
             for i in bodys.pandas().xyxy[0].values.tolist():
 
                 # 결과
@@ -91,7 +98,8 @@ def detect(return_dict):
                 target_point[1] = round(int(target_point[1]), 0)  # y - > top
                 points.append((target_point[0], target_point[1]))
                 flag = True  # 변환된 정보 저장
-
+            homo_end_time = time.time()
+            Homography_time = homo_end_time-homo_start_time
             # 변환된 보행자 픽셀 위치 저장
             if flag:
                 return_dict[cctv_name] = (flag, points)
@@ -99,15 +107,14 @@ def detect(return_dict):
                 return_dict[cctv_name] = (False, [])
             # temp_img = cv2.resize(img, dsize=(window_width, window_height))
             # cv2.imshow(cctv_name, temp_img)
-        start_time = time.time()
         send2server(return_dict)
-        end_time = time.time()
-        print(f'서버전송시간 - {round(end_time - start_time, 3)} s')
         # k = cv2.waitKey(1) & 0xff
         # if k == 27:
         #     break
-        Total_end_time = time.time()
-        print(f'전체처리시간 - {round(Total_end_time - Total_start_time, 3)} s')
+        with open("result.csv","a") as f:
+            wr = csv.writer(f)
+            wr.writerow([Frame_time,Yolo_time,Homography_time])
+
 
 
 
