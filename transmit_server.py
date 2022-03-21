@@ -47,8 +47,10 @@ def sub():
     client2.loop_forever()
 
 def send():
+    count = 0
     while True:
-        put("[{'id': 'CCTV20_1', 'top': 1805, 'left': 2438, 'update': '2022-03-18-16-40-05'}, {'id': 'CCTV21_1', 'top': 2305, 'left': 1221, 'update': '2022-03-18-16-40-05'}, {'id': 'CCTV22_1', 'top': 1390, 'left': 949, 'update': '2022-03-18-16-40-05'}, {'id': 'CCTV22_2', 'top': 1421, 'left': 995, 'update': '2022-03-18-16-40-05'}]")
+        put("#"+str(count+1))
+        count += 1
         time.sleep(10)
 
 if __name__ == '__main__':
