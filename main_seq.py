@@ -36,8 +36,6 @@ def getFrame(cctv_addr,cctv_name,return_dict):
 
 def detect(return_dict):
     font = cv2.FONT_HERSHEY_SIMPLEX  # 글씨 폰트
-    global Yolo_time,Frame_time,Homography_time
-    # yolov5
     # yolov5
     # 로컬 레포에서 모델 로드(yolov5s.pt 가중치 사용, 추후 학습후 path에 변경할 가중치 경로 입력)
     # 깃허브에서 yolov5 레포에서 모델 로드
@@ -49,9 +47,9 @@ def detect(return_dict):
     window_width=320
     window_height=270
     # # CCTV 화면 정렬
-    # for num,cctv_name in enumerate(cams.keys()):
-    #     cv2.namedWindow(cctv_name)
-    #     cv2.moveWindow(cctv_name,320*(num%6),270*(num//6))
+    for num,cctv_name in enumerate(cams.keys()):
+        cv2.namedWindow(cctv_name)
+        cv2.moveWindow(cctv_name,window_width*(num%6),window_height*(num//6))
     # CCTV 화면 추론
     while True:
         for cctv_name in cams.keys():
