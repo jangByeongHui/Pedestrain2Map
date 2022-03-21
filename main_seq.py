@@ -27,10 +27,10 @@ def getFrame(cctv_addr,cctv_name,return_dict):
             return_dict['img'][cctv_name] = Error_image
             #retry
             cap = cv2.VideoCapture(cctv_addr)
-        # k = cv2.waitKey(1) & 0xff
-        # if k == 27:
-        #     cap.release()
-        #     break
+        k = cv2.waitKey(1) & 0xff
+        if k == 27:
+            cap.release()
+            break
 
 
 
@@ -103,15 +103,16 @@ def detect(return_dict):
                 return_dict[cctv_name] = (flag, points)
             else:
                 return_dict[cctv_name] = (False, [])
-            # temp_img = cv2.resize(img, dsize=(window_width, window_height))
-            # cv2.imshow(cctv_name, temp_img)
+            temp_img = cv2.resize(img, dsize=(window_width, window_height))
+            cv2.imshow(cctv_name, temp_img)
         send2server(return_dict)
-        # k = cv2.waitKey(1) & 0xff
-        # if k == 27:
-        #     break
-        with open("result.csv","a") as f:
-            wr = csv.writer(f)
-            wr.writerow([return_dict['FRAME_TIME'],return_dict['YOLO_TIME'],return_dict['HOMOGRAPHY_TIME']])
+        k = cv2.waitKey(1) & 0xff
+        if k == 27:
+            break
+        #CSV에 시간 결과 저장
+        # with open("result.csv","a") as f:
+        #     wr = csv.writer(f)
+        #     wr.writerow([return_dict['FRAME_TIME'],return_dict['YOLO_TIME'],return_dict['HOMOGRAPHY_TIME']])
 
 
 
@@ -136,8 +137,8 @@ def send2server(data):
                     temp_list.append({'id': f'{cctv_name}_{num + 1}', 'top': y, 'left': x,
                                       'update': str(datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S'))})
                 # bot.sendMessage(chat_id=chat_id, text=f'cctv : {cctv_name} found {num+1} people!')
-        # temp_Map = cv2.resize(Map, dsize=(720, 480))
-        # cv2.imshow("Map", temp_Map)
+        temp_Map = cv2.resize(Map, dsize=(720, 480))
+        cv2.imshow("Map", temp_Map)
         if state:
             print(f'state:{state} data:{temp_list}')
             put(f'{temp_list}')
