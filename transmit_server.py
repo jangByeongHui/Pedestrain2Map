@@ -4,8 +4,7 @@ import paho.mqtt.client as mqtt
 import time
 import multiprocessing
 # data = [{'id': f'{cctv_name}_{num + 1}', 'top': y, 'left': x,'update': str(datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S'))}]
-start_time = 0
-end_time = 0
+
 def put(data):
     global start_time
     try:
@@ -17,23 +16,19 @@ def put(data):
         pubClt=mqtt.Client(clientId)
         pubClt.connect(mqttHost,mqttPort)
 
-
         pubClt.loop_start()
-        start_time = time.process_time()
         pubClt.publish(topic,data,1)
         pubClt.loop_stop()
-        print(f'Success publishing data')
+        print(f'Success publishing data {data}')
     except Exception as e:
         print(f'failed publishing data: {e}')
 
 def on_message(client, userdata, message):
-    global start_time,end_time
-    end_time =time.process_time()
     print("message received ", str(message.payload.decode("utf-8")))
     print("message topic=", message.topic)
     print("message qos=", message.qos)
     print("message retain flag=", message.retain)
-    print(f'spend Time : {int(round((end_time - start_time) * 1000))}ms')
+    print(f'spend Time : {int((time.time()-float(message.payload))*1000)} ms')
 
 
 def sub():
@@ -45,10 +40,8 @@ def sub():
     client2.loop_forever()
 
 def send():
-    count = 0
     while True:
-        put("#"+str(count+1))
-        count += 1
+        put(str(time.time()))
         time.sleep(10)
 
 if __name__ == '__main__':
