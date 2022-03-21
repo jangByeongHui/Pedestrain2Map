@@ -8,18 +8,16 @@ import datetime
 import multiprocessing
 import csv
 # import telegram
-Frame_time = 0
 Yolo_time = 0
 Homography_time = 0
 def getFrame(cctv_addr,cctv_name,return_dict):
-    global Frame_time
     font = cv2.FONT_HERSHEY_SIMPLEX  # 글씨 폰트
     cap = cv2.VideoCapture(cctv_addr)
     while True:
         start_time = time.time()
         ret,frame = cap.read()
         end_time = time.time()
-        Frame_time = end_time-start_time
+        return_dict['FRAME_TIME'] = end_time-start_time
         # print(f'{cctv_name} 프레임 가져오는 시간 - {round(end_time - start_time, 3)} s')
         if ret:
             return_dict['img'][cctv_name] = frame
@@ -62,7 +60,7 @@ def detect(return_dict):
             yolo_start_time=time.time()
             bodys = model(img, size=640)
             yolo_end_time=time.time()
-            Yolo_time = yolo_end_time-yolo_start_time
+            return_dict['YOLO_TIME'] = yolo_end_time-yolo_start_time
             #print(f'yolov5 {cctv_name} img 추론 시간 - {round(end_time - start_time, 3)} s')
             flag = False
             points = []
@@ -99,7 +97,7 @@ def detect(return_dict):
                 points.append((target_point[0], target_point[1]))
                 flag = True  # 변환된 정보 저장
             homo_end_time = time.time()
-            Homography_time = homo_end_time-homo_start_time
+            return_dict['HOMOGRAPHY_TIME'] = homo_end_time-homo_start_time
             # 변환된 보행자 픽셀 위치 저장
             if flag:
                 return_dict[cctv_name] = (flag, points)
@@ -113,7 +111,7 @@ def detect(return_dict):
         #     break
         with open("result.csv","a") as f:
             wr = csv.writer(f)
-            wr.writerow([Frame_time,Yolo_time,Homography_time])
+            wr.writerow([return_dict['FRAME_TIME'],return_dict['YOLO_TIME'],return_dict['HOMOGRAPHY_TIME']])
 
 
 
@@ -159,6 +157,9 @@ def main():
             "data/Anyang2_SKV1_ch4_20220124132217_20220124132240.mp4",
             "data/Anyang2_SKV1_ch5_20220126165037_20220126165047.mp4"]
     #init
+    return_dict['FRAME_TIME']=0
+    return_dict['YOLO_TIME'] = 0
+    return_dict['HOMOGRAPHY_TIME'] = 0
     for cctv_name in cams.keys():
         return_dict['img'][cctv_name] = np.zeros((1080, 1920, 3), np.uint8)
     work_lists=[]
