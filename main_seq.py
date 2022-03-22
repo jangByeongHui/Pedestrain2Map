@@ -164,8 +164,8 @@ def main():
     jobs=[]
 
     for num,cctv_name in enumerate(cams.keys()):
-        #work_lists.append((cams[cctv_name]['src'],cctv_name,return_dict))
-        work_lists.append((Rtsp[num], cctv_name, return_dict))
+        work_lists.append((cams[cctv_name]['src'],cctv_name,return_dict))
+        #work_lists.append((Rtsp[num], cctv_name, return_dict))
 
     for i,work in enumerate(work_lists):
         p = multiprocessing.Process(target=getFrame, args=work)
