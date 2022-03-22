@@ -108,9 +108,9 @@ def detect(return_dict):
         if k == 27:
             break
         #CSV에 시간 결과 저장
-        # with open("result.csv","a") as f:
-        #     wr = csv.writer(f)
-        #     wr.writerow([return_dict['FRAME_TIME'],return_dict['YOLO_TIME'],return_dict['HOMOGRAPHY_TIME']])
+        with open("result.csv","a") as f:
+            wr = csv.writer(f)
+            wr.writerow([return_dict['FRAME_TIME']*1000,return_dict['YOLO_TIME']*1000,return_dict['HOMOGRAPHY_TIME']*1000])
 
 
 
