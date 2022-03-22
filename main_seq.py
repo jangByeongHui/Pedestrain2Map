@@ -6,18 +6,17 @@ import numpy as np
 import torch
 import datetime
 import multiprocessing
-import csv
-# import telegram
-Yolo_time = 0
-Homography_time = 0
+# import csv
+import telegram
+
 def getFrame(cctv_addr,cctv_name,return_dict):
     font = cv2.FONT_HERSHEY_SIMPLEX  # 글씨 폰트
     cap = cv2.VideoCapture(cctv_addr)
     while True:
-        start_time = time.time()
+        # start_time = time.time()
         ret,frame = cap.read()
-        end_time = time.time()
-        return_dict['FRAME_TIME'] = end_time-start_time
+        # end_time = time.time()
+        # return_dict['FRAME_TIME'] = end_time-start_time
         # print(f'{cctv_name} 프레임 가져오는 시간 - {round(end_time - start_time, 3)} s')
         if ret:
             return_dict['img'][cctv_name] = frame
@@ -43,7 +42,7 @@ def detect(return_dict):
     model = torch.hub.load('yolov5', 'custom', path='yolov5s.pt', source='local', device=0)
     # 검출하고자 하는 객체는 사람이기 때문에 coco data에서 검출할 객체를 사람으로만 특정(yolov5s.pt 사용시)
     model.classes = [0]
-    model.conf = 0.7
+    model.conf = 0.5
     window_width=320
     window_height=270
     # # CCTV 화면 정렬
@@ -55,16 +54,16 @@ def detect(return_dict):
         for cctv_name in cams.keys():
             # 추론
             img = return_dict['img'][cctv_name]
-            yolo_start_time=time.time()
+            # yolo_start_time=time.time()
             bodys = model(img, size=640)
-            yolo_end_time=time.time()
-            return_dict['YOLO_TIME'] = yolo_end_time-yolo_start_time
+            # yolo_end_time=time.time()
+            # return_dict['YOLO_TIME'] = yolo_end_time-yolo_start_time
             #print(f'yolov5 {cctv_name} img 추론 시간 - {round(end_time - start_time, 3)} s')
             flag = False
             points = []
 
             # yolo5
-            homo_start_time = time.time()
+            # homo_start_time = time.time()
             for i in bodys.pandas().xyxy[0].values.tolist():
 
                 # 결과
@@ -94,8 +93,8 @@ def detect(return_dict):
                 target_point[1] = round(int(target_point[1]), 0)  # y - > top
                 points.append((target_point[0], target_point[1]))
                 flag = True  # 변환된 정보 저장
-            homo_end_time = time.time()
-            return_dict['HOMOGRAPHY_TIME'] = homo_end_time-homo_start_time
+            # homo_end_time = time.time()
+            # return_dict['HOMOGRAPHY_TIME'] = homo_end_time-homo_start_time
             # 변환된 보행자 픽셀 위치 저장
             if flag:
                 return_dict[cctv_name] = (flag, points)
@@ -108,9 +107,9 @@ def detect(return_dict):
         if k == 27:
             break
         #CSV에 시간 결과 저장
-        with open("result.csv","a") as f:
-            wr = csv.writer(f)
-            wr.writerow([return_dict['FRAME_TIME']*1000,return_dict['YOLO_TIME']*1000,return_dict['HOMOGRAPHY_TIME']*1000])
+        # with open("result.csv","a") as f:
+        #     wr = csv.writer(f)
+        #     wr.writerow([return_dict['FRAME_TIME']*1000,return_dict['YOLO_TIME']*1000,return_dict['HOMOGRAPHY_TIME']*1000])
 
 
 
@@ -118,8 +117,8 @@ def detect(return_dict):
 # 추후 서버 전송
 # MQTT 전송시에는 데이터를 문자열로 보내야 한다.
 def send2server(data):
-    # bot = telegram.Bot(token="5137138184:AAEf4mPnuYIz2YT5HWGACYy5cKHsgo68OPY")
-    # chat_id = 1930625013
+    bot = telegram.Bot(token="5137138184:AAEf4mPnuYIz2YT5HWGACYy5cKHsgo68OPY")
+    chat_id = 1930625013
     Map_path = "./data/B3.png"
 
     Map = cv2.imread(Map_path)
@@ -134,7 +133,7 @@ def send2server(data):
                     Map = cv2.circle(Map, (x, y), 30, (0, 255, 0), -1)  # 지도위에 표시
                     temp_list.append({'id': f'{cctv_name}_{num + 1}', 'top': y, 'left': x,
                                       'update': str(datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S'))})
-                # bot.sendMessage(chat_id=chat_id, text=f'cctv : {cctv_name} found {num+1} people!')
+                bot.sendMessage(chat_id=chat_id, text=f'cctv : {cctv_name} found {num+1} people!')
         temp_Map = cv2.resize(Map, dsize=(720, 480))
         cv2.imshow("Map", temp_Map)
         if state:
@@ -151,14 +150,14 @@ def main():
     manager = multiprocessing.Manager()
     return_dict = manager.dict()
     return_dict['img'] = manager.dict()
-    Rtsp = ["./data/Anyang2_SKV1_ch1_20220121090906.mp4", "./data/Anyang2_SKV1_ch2_20220126165051_20220126165101.mp4",
-            "./data/Anyang2_SKV1_ch3_20220126165125_20220126165210.mp4",
-            "data/Anyang2_SKV1_ch4_20220124132217_20220124132240.mp4",
-            "data/Anyang2_SKV1_ch5_20220126165037_20220126165047.mp4"]
+    # Rtsp = ["./data/Anyang2_SKV1_ch1_20220121090906.mp4", "./data/Anyang2_SKV1_ch2_20220126165051_20220126165101.mp4",
+    #         "./data/Anyang2_SKV1_ch3_20220126165125_20220126165210.mp4",
+    #         "data/Anyang2_SKV1_ch4_20220124132217_20220124132240.mp4",
+    #         "data/Anyang2_SKV1_ch5_20220126165037_20220126165047.mp4"]
     #init
-    return_dict['FRAME_TIME']=0
-    return_dict['YOLO_TIME'] = 0
-    return_dict['HOMOGRAPHY_TIME'] = 0
+    # return_dict['FRAME_TIME']=0
+    # return_dict['YOLO_TIME'] = 0
+    # return_dict['HOMOGRAPHY_TIME'] = 0
     for cctv_name in cams.keys():
         return_dict['img'][cctv_name] = np.zeros((1080, 1920, 3), np.uint8)
     work_lists=[]
