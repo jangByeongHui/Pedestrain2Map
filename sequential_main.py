@@ -12,16 +12,17 @@ import telegram
 def getFrame(return_dict):
     font = cv2.FONT_HERSHEY_SIMPLEX  # 글씨 폰트
     caps = []
-    Rtsp = ["./data/Anyang2_SKV1_ch1_20220121090906.mp4", "./data/Anyang2_SKV1_ch2_20220126165051_20220126165101.mp4",
-            "./data/Anyang2_SKV1_ch3_20220126165125_20220126165210.mp4",
-            "data/Anyang2_SKV1_ch4_20220124132217_20220124132240.mp4",
-            "data/Anyang2_SKV1_ch5_20220126165037_20220126165047.mp4"]
+    # Rtsp = ["./data/Anyang2_SKV1_ch1_20220121090906.mp4", "./data/Anyang2_SKV1_ch2_20220126165051_20220126165101.mp4",
+    #         "./data/Anyang2_SKV1_ch3_20220126165125_20220126165210.mp4",
+    #         "data/Anyang2_SKV1_ch4_20220124132217_20220124132240.mp4",
+    #         "data/Anyang2_SKV1_ch5_20220126165037_20220126165047.mp4"]
     for num,cctv_name in enumerate(cams.keys()):
-        #caps.append((cv2.VideoCapture(cams[cctv_name]['src'],cctv_name)))
-        caps.append((cv2.VideoCapture(Rtsp[num], cctv_name)))
+        caps.append((cv2.VideoCapture(cams[cctv_name]['src']),cctv_name))
+        #caps.append((cv2.VideoCapture(Rtsp[num]),cctv_name))
 
     while True:
-        for cap,cctv_name in caps:
+        start_time = time.time()
+        for num, (cap, cctv_name) in enumerate(caps):
             ret,frame = cap.read()
             if ret:
                 return_dict['img'][cctv_name] = frame
@@ -30,11 +31,10 @@ def getFrame(return_dict):
                 cv2.putText(Error_image, "Video Not Found!", (20, 70), font, 1, (0, 0, 255), 3)  # 비디오 접속 끊어짐 표시
                 return_dict['img'][cctv_name] = Error_image
                 #retry
-                cap = cv2.VideoCapture(cams[cctv_name]['src'])
-            k = cv2.waitKey(1) & 0xff
-            if k == 27:
-                cap.release()
-                break
+                caps[num] = (cv2.VideoCapture(cams[cctv_name]['src']),cctv_name)
+                #caps[num] = (cv2.VideoCapture(Rtsp[num]),cctv_name)
+        end_time = time.time()
+        print(f'get Frame time{end_time-start_time} s')
 
 
 
