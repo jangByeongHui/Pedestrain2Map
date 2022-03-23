@@ -18,7 +18,7 @@ def getFrame(return_dict):
             "data/Anyang2_SKV1_ch5_20220126165037_20220126165047.mp4"]
     for num,cctv_name in enumerate(cams.keys()):
         #caps.append((cv2.VideoCapture(cams[cctv_name]['src'],cctv_name)))
-        caps.append((cv2.VideoCapture(Rtsp[num]['src'], cctv_name)))
+        caps.append((cv2.VideoCapture(Rtsp[num], cctv_name)))
 
     while True:
         for cap,cctv_name in caps:
