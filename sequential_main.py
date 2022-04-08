@@ -53,6 +53,7 @@ def detect(return_dict,model_index):
     window_height=270
     # # CCTV 화면 정렬
     for num,cctv_name in enumerate(cams.keys()):
+        if num % 3 != model_index: continue
         cv2.namedWindow(cctv_name)
         cv2.moveWindow(cctv_name,window_width*(num%6),window_height*(num//6))
     # CCTV 화면 추론
