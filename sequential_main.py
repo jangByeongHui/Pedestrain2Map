@@ -33,6 +33,7 @@ def getFrame(return_dict):
                 #retry
                 caps[num] = (cv2.VideoCapture(cams[cctv_name]['src']),cctv_name)
                 #caps[num] = (cv2.VideoCapture(Rtsp[num]),cctv_name)
+            caps[num] = (cv2.VideoCapture(cams[cctv_name]['src']), cctv_name)
         end_time = time.time()
         print(f'get Frame time{end_time-start_time} s')
 
