@@ -38,13 +38,14 @@ def getFrame(return_dict):
 
 
 
-def detect(return_dict):
+def detect(return_dict,model_index):
     font = cv2.FONT_HERSHEY_SIMPLEX  # 글씨 폰트
     # yolov5
     # 로컬 레포에서 모델 로드(yolov5s.pt 가중치 사용, 추후 학습후 path에 변경할 가중치 경로 입력)
     # 깃허브에서 yolov5 레포에서 모델 로드
     # model = torch.hub.load('ultralytics/yolov5', 'custom', path='yolov5s.pt',device=num%3)
-    model = torch.hub.load('yolov5', 'custom', path='yolov5s.pt', source='local', device=0)
+    model = torch.hub.load('yolov5', 'custom', path='yolov5s.pt', source='local', device=model_index)
+
     # 검출하고자 하는 객체는 사람이기 때문에 coco data에서 검출할 객체를 사람으로만 특정(yolov5s.pt 사용시)
     model.classes = [0]
     model.conf = 0.5
@@ -56,7 +57,8 @@ def detect(return_dict):
         cv2.moveWindow(cctv_name,window_width*(num%6),window_height*(num//6))
     # CCTV 화면 추론
     while True:
-        for cctv_name in cams.keys():
+        for num,cctv_name in enumerate(cams.keys()):
+            if num%3 != model_index: continue
             # 추론
             img = return_dict['img'][cctv_name]
             # yolo_start_time=time.time()
@@ -171,7 +173,16 @@ def main():
     p.start()
 
     # Yolo 추론
-    p = multiprocessing.Process(target=detect, args=(return_dict,))
+    #첫 번째 모델
+    p = multiprocessing.Process(target=detect, args=(return_dict,0))
+    jobs.append(p)
+    p.start()
+    #두 번째 모델
+    p = multiprocessing.Process(target=detect, args=(return_dict, 1))
+    jobs.append(p)
+    p.start()
+    #세 번째 모델
+    p = multiprocessing.Process(target=detect, args=(return_dict, 2))
     jobs.append(p)
     p.start()
 
