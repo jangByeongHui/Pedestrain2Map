@@ -104,14 +104,13 @@ def multidetect(cctv_names,return_dict,num):
                 cv2.putText(Error_image, "Video Not Found!", (20, 70), font, 1, (0, 0, 255), 3)  # 비디오 접속 끊어짐 표시
                 cv2.imshow(cctv_name, Error_image)
                 # f.write("{} Video({}) Not found\n".format(datetime.datetime.now(),cctv_name))
-                cap.release()
+                caps[cctv_name].release()
                 # break
-                cap = cv2.VideoCapture(addr)
-                time.sleep(10)
+                caps[cctv_name] = cv2.VideoCapture(addr)
             #ESC 누를 시 종료
             k = cv2.waitKey(1) & 0xff
             if k == 27:
-                cap.release()
+                caps[cctv_name].release()
                 # out.release()
                 break
 
