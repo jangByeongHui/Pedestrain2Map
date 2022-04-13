@@ -6,29 +6,37 @@ import numpy as np
 import torch
 import datetime
 import multiprocessing
+import math
 # import csv
 import telegram
 
-def getFrame(cctv_addr,cctv_name,return_dict):
+
+def getFrame(return_dict,start_pos,end_pos):
     font = cv2.FONT_HERSHEY_SIMPLEX  # 글씨 폰트
-    cap = cv2.VideoCapture(cctv_addr)
+    cctv_names = list(cams.keys())
+    caps = []
+    if end_pos==-1:
+         for cctv_name in cctv_names[start_pos:]:
+            caps.append((cctv_name,cv2.VideoCapture(cams[cctv_name]['src'])))
+    else:
+        for cctv_name in cctv_names[start_pos:end_pos]:
+            caps.append((cctv_name,cv2.VideoCapture(cams[cctv_name]['src'])))
     while True:
-        # start_time = time.time()
-        ret,frame = cap.read()
-        # end_time = time.time()
-        # return_dict['FRAME_TIME'] = end_time-start_time
-        # print(f'{cctv_name} 프레임 가져오는 시간 - {round(end_time - start_time, 3)} s')
-        if ret:
-            return_dict['img'][cctv_name] = frame
-        else:
-            Error_image = np.zeros((720, 1920, 3), np.uint8)
-            cv2.putText(Error_image, "Video Not Found!", (20, 70), font, 1, (0, 0, 255), 3)  # 비디오 접속 끊어짐 표시
-            return_dict['img'][cctv_name] = Error_image
+        try:
+            for cam_index,(cctv_name,cap) in enumerate(caps):
+                ret, frame = cap.read()
+                if ret:
+                    return_dict['img'][cctv_name] = frame
+                else:
+                    Error_image = np.zeros((720, 1920, 3), np.uint8)
+                    cv2.putText(Error_image, "Video Not Found!", (20, 70), font, 1, (0, 0, 255), 3)  # 비디오 접속 끊어짐 표시
+                    return_dict['img'][cctv_name] = Error_image
 
-        # reconnect
-        cap.release()
-        cap = cv2.VideoCapture(cctv_addr)
-
+                # reconnect
+                cap.release()
+                caps[cam_index] = (cctv_name,cv2.VideoCapture(cams[cctv_name]['src']))
+        except:
+            print(f'Error : {caps}')
 
 
 def detect(return_dict):
@@ -41,30 +49,29 @@ def detect(return_dict):
     # 검출하고자 하는 객체는 사람이기 때문에 coco data에서 검출할 객체를 사람으로만 특정(yolov5s.pt 사용시)
     model.classes = [0]
     model.conf = 0.5
-    window_width=320
-    window_height=270
+    window_width = 320
+    window_height = 270
     # # CCTV 화면 정렬
     for num, cctv_name in enumerate(cams.keys()):
         cv2.namedWindow(cctv_name)
         cv2.moveWindow(cctv_name, window_width * (num % 6), window_height * (num // 6))
-    
+
     # CCTV 화면 추론
     while True:
-        for cam_index,cctv_name in enumerate(cams.keys()):
+        for cam_index, cctv_name in enumerate(cams.keys()):
             # 추론
             img = return_dict['img'][cctv_name]
             # yolo_start_time=time.time()
             bodys = model(img, size=640)
             # yolo_end_time=time.time()
             # return_dict['YOLO_TIME'] = yolo_end_time-yolo_start_time
-            #print(f'yolov5 {cctv_name} img 추론 시간 - {round(end_time - start_time, 3)} s')
+            # print(f'yolov5 {cctv_name} img 추론 시간 - {round(end_time - start_time, 3)} s')
             flag = False
             points = []
 
             # yolo5
             # homo_start_time = time.time()
             for i in bodys.pandas().xyxy[0].values.tolist():
-
                 # 결과
                 x1, y1, x2, y2, conf, cls, name = int(i[0]), int(i[1]), int(i[2]), int(i[3]), i[4], i[5], i[6]
 
@@ -105,12 +112,10 @@ def detect(return_dict):
         k = cv2.waitKey(1) & 0xff
         if k == 27:
             break
-        #CSV에 시간 결과 저장
+        # CSV에 시간 결과 저장
         # with open("result.csv","a") as f:
         #     wr = csv.writer(f)
         #     wr.writerow([return_dict['FRAME_TIME']*1000,return_dict['YOLO_TIME']*1000,return_dict['HOMOGRAPHY_TIME']*1000])
-
-
 
 
 # 추후 서버 전송
@@ -132,7 +137,7 @@ def send2server(data):
                     Map = cv2.circle(Map, (x, y), 30, (0, 255, 0), -1)  # 지도위에 표시
                     temp_list.append({'id': f'{cctv_name}_{num + 1}', 'top': y, 'left': x,
                                       'update': str(datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S'))})
-                #bot.sendMessage(chat_id=chat_id, text=f'cctv : {cctv_name} found {num+1} people!')
+                # bot.sendMessage(chat_id=chat_id, text=f'cctv : {cctv_name} found {num+1} people!')
         temp_Map = cv2.resize(Map, dsize=(720, 480))
         cv2.imshow("Map", temp_Map)
         if state:
@@ -149,28 +154,32 @@ def main():
     manager = multiprocessing.Manager()
     return_dict = manager.dict()
     return_dict['img'] = manager.dict()
-    window_width=320
-    window_height=270
+    window_width = 320
+    window_height = 270
     # Rtsp = ["./data/Anyang2_SKV1_ch1_20220121090906.mp4", "./data/Anyang2_SKV1_ch2_20220126165051_20220126165101.mp4",
     #         "./data/Anyang2_SKV1_ch3_20220126165125_20220126165210.mp4",
     #         "data/Anyang2_SKV1_ch4_20220124132217_20220124132240.mp4",
     #         "data/Anyang2_SKV1_ch5_20220126165037_20220126165047.mp4"]
-    #init
+    # init
     # return_dict['FRAME_TIME']=0
     # return_dict['YOLO_TIME'] = 0
     # return_dict['HOMOGRAPHY_TIME'] = 0
     for cctv_name in cams.keys():
         return_dict['img'][cctv_name] = np.zeros((1080, 1920, 3), np.uint8)
     # # CCTV 화면 정렬
-    
-    work_lists=[]
-    jobs=[]
 
-    for num,cctv_name in enumerate(cams.keys()):
-        work_lists.append((cams[cctv_name]['src'],cctv_name,return_dict))
-        #work_lists.append((Rtsp[num], cctv_name, return_dict))
+    work_lists = []
+    jobs = []
+    getFrame_Num = 2
+    cctv_names_len = len(list(cams.keys()))
+    perSize = int(math.ceil(cctv_names_len/2))
 
-    for i,work in enumerate(work_lists):
+    for i in range(getFrame_Num-1):
+        work_lists.append((return_dict,i*perSize,(i+1)*perSize))
+    else:
+        work_lists.append((return_dict, (i+1) * perSize,-1))
+
+    for i, work in enumerate(work_lists):
         p = multiprocessing.Process(target=getFrame, args=work)
         jobs.append(p)
         p.start()
