@@ -15,23 +15,28 @@ def getFrame(return_dict,start_pos,end_pos):
     font = cv2.FONT_HERSHEY_SIMPLEX  # 글씨 폰트
     cctv_names = list(cams.keys())
     caps = []
-
-    for cctv_name in cctv_names[start_pos:end_pos]:
-        caps.append(cctv_name,cv2.VideoCapture(cams[cctv_name]['src']))
-
+    if end_pos==-1:
+         for cctv_name in cctv_names[start_pos:]:
+            caps.append((cctv_name,cv2.VideoCapture(cams[cctv_name]['src'])))
+    else:
+        for cctv_name in cctv_names[start_pos:end_pos]:
+            caps.append((cctv_name,cv2.VideoCapture(cams[cctv_name]['src'])))
     while True:
-        for num,cctv_name,cap in enumerate(caps):
-            ret, frame = cap.read()
-            if ret:
-                return_dict['img'][cctv_name] = frame
-            else:
-                Error_image = np.zeros((720, 1920, 3), np.uint8)
-                cv2.putText(Error_image, "Video Not Found!", (20, 70), font, 1, (0, 0, 255), 3)  # 비디오 접속 끊어짐 표시
-                return_dict['img'][cctv_name] = Error_image
+        try:
+            for cam_index,(cctv_name,cap) in enumerate(caps):
+                ret, frame = cap.read()
+                if ret:
+                    return_dict['img'][cctv_name] = frame
+                else:
+                    Error_image = np.zeros((720, 1920, 3), np.uint8)
+                    cv2.putText(Error_image, "Video Not Found!", (20, 70), font, 1, (0, 0, 255), 3)  # 비디오 접속 끊어짐 표시
+                    return_dict['img'][cctv_name] = Error_image
 
-            # reconnect
-            cap.release()
-            caps[num] = cv2.VideoCapture(cams[cctv_name]['src'])
+                # reconnect
+                cap.release()
+                caps[cam_index] = (cctv_name,cv2.VideoCapture(cams[cctv_name]['src']))
+        except:
+            print(f'Error : {caps}')
 
 
 def detect(return_dict):
