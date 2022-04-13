@@ -6,29 +6,32 @@ import numpy as np
 import torch
 import datetime
 import multiprocessing
+import math
 # import csv
 import telegram
 
 
-def getFrame(cctv_addr, cctv_name, return_dict):
+def getFrame(return_dict,start_pos,end_pos):
     font = cv2.FONT_HERSHEY_SIMPLEX  # 글씨 폰트
-    cap = cv2.VideoCapture(cctv_addr)
-    while True:
-        # start_time = time.time()
-        ret, frame = cap.read()
-        # end_time = time.time()
-        # return_dict['FRAME_TIME'] = end_time-start_time
-        # print(f'{cctv_name} 프레임 가져오는 시간 - {round(end_time - start_time, 3)} s')
-        if ret:
-            return_dict['img'][cctv_name] = frame
-        else:
-            Error_image = np.zeros((720, 1920, 3), np.uint8)
-            cv2.putText(Error_image, "Video Not Found!", (20, 70), font, 1, (0, 0, 255), 3)  # 비디오 접속 끊어짐 표시
-            return_dict['img'][cctv_name] = Error_image
+    cctv_names = list(cams.keys())
+    caps = []
 
-        # reconnect
-        cap.release()
-        cap = cv2.VideoCapture(cctv_addr)
+    for cctv_name in cctv_names[start_pos:end_pos]:
+        caps.append(cctv_name,cv2.VideoCapture(cams[cctv_name]['src']))
+
+    while True:
+        for num,cctv_name,cap in enumerate(caps):
+            ret, frame = cap.read()
+            if ret:
+                return_dict['img'][cctv_name] = frame
+            else:
+                Error_image = np.zeros((720, 1920, 3), np.uint8)
+                cv2.putText(Error_image, "Video Not Found!", (20, 70), font, 1, (0, 0, 255), 3)  # 비디오 접속 끊어짐 표시
+                return_dict['img'][cctv_name] = Error_image
+
+            # reconnect
+            cap.release()
+            caps[num] = cv2.VideoCapture(cams[cctv_name]['src'])
 
 
 def detect(return_dict):
@@ -162,10 +165,14 @@ def main():
 
     work_lists = []
     jobs = []
+    getFrame_Num = 2
+    cctv_names_len = len(list(cams.keys()))
+    perSize = int(math.ceil(cctv_names_len/2))
 
-    for num, cctv_name in enumerate(cams.keys()):
-        work_lists.append((cams[cctv_name]['src'], cctv_name, return_dict))
-        # work_lists.append((Rtsp[num], cctv_name, return_dict))
+    for i in range(getFrame_Num-1):
+        work_lists.append((return_dict,i*perSize,(i+1)*perSize))
+    else:
+        work_lists.append((return_dict, (i+1) * perSize,-1))
 
     for i, work in enumerate(work_lists):
         p = multiprocessing.Process(target=getFrame, args=work)
