@@ -14,7 +14,6 @@ def getFrame(cctv_addr,cctv_name):
     cap = cv2.VideoCapture(cctv_addr)
     cap.set(cv2.CAP_PROP_XI_RECENT_FRAME,1)
     cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
-    cap.set(cv2.CAP_PROP_POS_MSEC,4000)
     while True:
         # start_time = time.time()
         ret,frame = cap.read()
@@ -29,17 +28,18 @@ def getFrame(cctv_addr,cctv_name):
             cv2.imwrite("./img/"+cctv_name+".jpg",Error_image)
 
             # reconnect
-            cap.release()
-            cap = cv2.VideoCapture(cctv_addr)
+        cap.release()
+        cap = cv2.VideoCapture(cctv_addr)
 
 
 
-def detect(return_dict):
+def detect():
     font = cv2.FONT_HERSHEY_SIMPLEX  # 글씨 폰트
     # yolov5
     # 로컬 레포에서 모델 로드(yolov5s.pt 가중치 사용, 추후 학습후 path에 변경할 가중치 경로 입력)
     # 깃허브에서 yolov5 레포에서 모델 로드
     # model = torch.hub.load('ultralytics/yolov5', 'custom', path='yolov5s.pt',device=num%3)
+    return_dict = dict()
     model = torch.hub.load('yolov5', 'custom', path='yolov5s.pt', source='local', device=1)
     # 검출하고자 하는 객체는 사람이기 때문에 coco data에서 검출할 객체를 사람으로만 특정(yolov5s.pt 사용시)
     model.classes = [0]
@@ -153,8 +153,6 @@ def send2server(data):
 def main():
     # 작업 결과 저장 dict
     manager = multiprocessing.Manager()
-    return_dict = manager.dict()
-    return_dict['img'] = manager.dict()
     window_width=320
     window_height=270
     # Rtsp = ["./data/Anyang2_SKV1_ch1_20220121090906.mp4", "./data/Anyang2_SKV1_ch2_20220126165051_20220126165101.mp4",
@@ -165,8 +163,7 @@ def main():
     # return_dict['FRAME_TIME']=0
     # return_dict['YOLO_TIME'] = 0
     # return_dict['HOMOGRAPHY_TIME'] = 0
-    for cctv_name in cams.keys():
-        return_dict['img'][cctv_name] = np.zeros((1080, 1920, 3), np.uint8)
+
     # # CCTV 화면 정렬
     
     work_lists=[]
@@ -181,7 +178,7 @@ def main():
         jobs.append(p)
         p.start()
     else:
-        p = multiprocessing.Process(target=detect, args=(return_dict,))
+        p = multiprocessing.Process(target=detect)
         jobs.append(p)
         p.start()
 
